@@ -1,0 +1,96 @@
+<?php
+	$line2=array();
+	
+	if (($file = fopen("test.csv", "r")) !== FALSE) 
+	{
+		while (($line = fgetcsv($file)) !== FALSE) 
+		{
+			$line2=array_chunk($line, 6);
+		}
+		fclose($file);
+	}
+	
+	function searchUser($email, $password, $line2)
+	{
+		for ($i=0; $i<count($line2); $i++)
+		{	
+			if ($line2[$i][3]==$email && $line2[$i][4]==$password)
+			{
+				echo "User found! <br>";
+				for ($j=0; $j<6; $j++)
+				{
+					switch($j)
+					{
+						case 0:
+							echo "First Name: ".$line2[$i][$j];
+							break;
+						case 1:
+							echo "Last Name: ".$line2[$i][$j];
+							break;
+						case 2:
+							echo "Username: ".$line2[$i][$j];
+							break;
+						case 3:
+							echo "Email: ".$line2[$i][$j];
+							break;
+						case 4:
+							echo "Password: ".$line2[$i][$j];
+							break;
+						case 5:
+							echo "ID: ".$line2[$i][$j];
+							break;
+					}
+					echo "<br>";
+				} 
+				return;
+			}
+		}
+		
+		echo "Email and password not found.";
+	}
+	
+	function hardCodeUser($line2)
+	{
+		$email="bjones@blah.com";
+		$password="90";
+		
+		for ($i=0; $i<count($line2); $i++)
+		{	
+			if ($line2[$i][3]==$email && $line2[$i][4]==$password)
+			{
+				echo "User found! <br>";
+				for ($j=0; $j<6; $j++)
+				{
+					switch($j)
+					{
+						case 0:
+							echo "First Name: ".$line2[$i][$j];
+							break;
+						case 1:
+							echo "Last Name: ".$line2[$i][$j];
+							break;
+						case 2:
+							echo "Username: ".$line2[$i][$j];
+							break;
+						case 3:
+							echo "Email: ".$line2[$i][$j];
+							break;
+						case 4:
+							echo "Password: ".$line2[$i][$j];
+							break;
+						case 5:
+							echo "ID: ".$line2[$i][$j];
+							break;
+					}
+					echo "<br>";
+				} 
+				return;
+			}
+		}
+		
+		echo "Email and password not found.";
+	}
+	
+	searchUser("shead@blah.com", "5678", $line2);
+	hardCodeUser($line2);
+?>
