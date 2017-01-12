@@ -17,7 +17,7 @@ if (!isset($_SESSION['roleID'], $_SESSION['userEmail'])):
 </head>
 
 <body>
-<-- displaySite("Login"); -->
+<!-- displaySite("Login"); -->
     <div class="container">
         <div class="row">
             <div class="col-md-4 col-md-offset-4">

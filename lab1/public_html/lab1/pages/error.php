@@ -1,6 +1,5 @@
 <?php 
     echo '
-		<-- displaySite("Error Page"); -->
         <!DOCTYPE html>
         <html lang="en">
 
@@ -15,6 +14,7 @@
 		
         <body>
 
+		<!-- displaySite("Error Page"); -->
             <div id="wrapper">
 
         	<!-- Navigation Menu -->

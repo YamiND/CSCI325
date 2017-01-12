@@ -103,6 +103,7 @@ function updateBookForm($bookISBN)
 	        $bookStock = $newArray[$i][8];
 			
     		generateFormStart("../includes/userFunctions/updateBook", "post"); 
+				generateFormHiddenInput("oldBookISBN", $bookISBN);
 			    generateFormInputDiv("ISBN", "number", "bookISBN", $bookISBN, NULL, NULL, NULL, "ISBN");
 				generateFormInputDiv("Title", "text", "bookTitle", $bookTitle, NULL, NULL, NULL, "Title");
 				generateFormInputDiv("Author", "text", "bookAuthor", $bookAuthor, NULL, NULL, NULL, "Author");

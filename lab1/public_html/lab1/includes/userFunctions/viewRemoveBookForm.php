@@ -58,7 +58,7 @@ echo '
 function removeBookForm()
 {
     generateFormStart("../includes/userFunctions/removeBook", "post"); 
-        generateFormStartSelectDiv("Book Title", "bookTitle");
+        generateFormStartSelectDiv("Book Title", "bookISBN");
 			getBookList();
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Remove Book");
