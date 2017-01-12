@@ -19,7 +19,7 @@ if (login_check() == true)
                         <span class="icon-bar"></span>
                         <span class="icon-bar"></span>
                     </button>
-                    <a class="navbar-brand" href="#">Inventory Management</a>
+                    <a class="navbar-brand" href="index">Inventory Management</a>
                 </div>
                 <!-- /.navbar-header -->
                 <ul class="nav navbar-top-links navbar-right">
