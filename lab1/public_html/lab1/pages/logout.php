@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta http-equiv="refresh" content="0;url=../includes/logout">
-<!-- displaySite("Login"); -->
+<!-- displaySite("Logout"); -->
 <title>Management Book System</title>
 <script language="javascript">
     window.location.href = "../includes/logout"
