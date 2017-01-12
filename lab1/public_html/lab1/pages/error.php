@@ -1,5 +1,6 @@
 <?php 
     echo '
+		<-- displaySite("Error Page"); -->
         <!DOCTYPE html>
         <html lang="en">
 

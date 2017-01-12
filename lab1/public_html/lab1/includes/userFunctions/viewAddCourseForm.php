@@ -4,7 +4,7 @@ function checkPermissions()
 {
     if (login_check() == true)
     {
-        viewCreateUserForm();
+        viewAddCourseForm();
     }
     else
     {
@@ -15,7 +15,7 @@ function checkPermissions()
 }
 
 
-function viewCreateUserForm()
+function viewAddCourseForm()
 {
     echo '
             <div class="row">
@@ -23,14 +23,14 @@ function viewCreateUserForm()
                     <div class="panel panel-default">
                         <div class="panel-heading">
 	';
-						displayPanelHeading("Create User");
+						displayPanelHeading("Add Course");
 echo '
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#administrator" data-toggle="tab">User</a>
+                                <li class="active"><a href="#administrator" data-toggle="tab">Add Course</a>
                                 </li>
                             </ul>
 
@@ -39,7 +39,7 @@ echo '
                                 <div class="tab-pane fade in active" id="administrator">
                                     <br>
             ';
-                                    createUserForm();
+                                    addCourseForm();
                                     
         echo '
                                 </div>
@@ -54,20 +54,36 @@ echo '
 
 }
 
-function createUserForm()
+function addCourseForm()
 {
-    	generateFormStart("../includes/userFunctions/createUser", "post"); 
-        generateFormInputDiv("Email", "email", "userEmail", NULL, NULL, NULL, NULL, "Email");
-        generateFormInputDiv("UserName", "text", "userName", NULL, NULL, NULL, NULL, "Username");
-        generateFormInputDiv("First Name", "text", "userFirstName", NULL, NULL, NULL, NULL, "First Name");
-        generateFormInputDiv("Last Name", "text", "userLastName", NULL, NULL, NULL, NULL, "Last Name");
-	generateFormInputDiv("Password", "password", "userPassword", NULL, NULL, NULL, NULL, "Password");
-        generateFormStartSelectDiv("User Role", "userRole");
-        generateFormOption("0", "Faculty");
-        generateFormOption("1", "Student");
+    generateFormStart("../includes/userFunctions/addCourse", "post"); 
+        generateFormInputDiv("Course Number", "text", "courseNumber", NULL, NULL, NULL, NULL, "Course Number");
+        generateFormInputDiv("Course Title", "text", "courseTitle", NULL, NULL, NULL, NULL, "Course Title");
+		generateFormTextAreaDiv("Course Description", "courseDescription", "5");	
+        generateFormInputDiv("Course Description Year", "number", "courseYear", date('Y'), NULL, NULL, NULL, "Course Description Year");
+		generateFormStartSelectDiv("Faculty Last Name", "courseFaculty");
+               getFacultyList();
         generateFormEndSelectDiv();
-        generateFormButton(NULL, "Create User");
-        generateFormEnd();
+        generateFormButton(NULL, "Add Course");
+   generateFormEnd();
+}
+
+function getFacultyList()
+{
+    $fileName = USERCSV;
+
+    $newArray = array_map('str_getcsv', file($fileName));
+
+    for ($i = 0; $i < count($newArray); $i++)
+    {   
+        $userRoleID = $newArray[$i][5];
+
+        if ($userRoleID == 0)
+        {   
+            $userLastName = $newArray[$i][1];
+            generateFormOption($userLastName, $userLastName);
+        }   
+    }   
 }
 
 ?>

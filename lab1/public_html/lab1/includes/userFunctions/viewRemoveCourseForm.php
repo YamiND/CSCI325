@@ -4,7 +4,8 @@ function checkPermissions()
 {
     if (login_check() == true)
     {
-        viewCreateUserForm();
+        viewRemoveCourseForm();
+
     }
     else
     {
@@ -15,7 +16,7 @@ function checkPermissions()
 }
 
 
-function viewCreateUserForm()
+function viewRemoveCourseForm()
 {
     echo '
             <div class="row">
@@ -23,7 +24,7 @@ function viewCreateUserForm()
                     <div class="panel panel-default">
                         <div class="panel-heading">
 	';
-						displayPanelHeading("Create User");
+						displayPanelHeading("Remove Course");
 echo '
                         </div>
                         <!-- /.panel-heading -->
@@ -39,7 +40,7 @@ echo '
                                 <div class="tab-pane fade in active" id="administrator">
                                     <br>
             ';
-                                    createUserForm();
+                                    removeCourseForm();
                                     
         echo '
                                 </div>
@@ -54,20 +55,26 @@ echo '
 
 }
 
-function createUserForm()
+function removeCourseForm()
 {
-    	generateFormStart("../includes/userFunctions/createUser", "post"); 
-        generateFormInputDiv("Email", "email", "userEmail", NULL, NULL, NULL, NULL, "Email");
-        generateFormInputDiv("UserName", "text", "userName", NULL, NULL, NULL, NULL, "Username");
-        generateFormInputDiv("First Name", "text", "userFirstName", NULL, NULL, NULL, NULL, "First Name");
-        generateFormInputDiv("Last Name", "text", "userLastName", NULL, NULL, NULL, NULL, "Last Name");
-	generateFormInputDiv("Password", "password", "userPassword", NULL, NULL, NULL, NULL, "Password");
-        generateFormStartSelectDiv("User Role", "userRole");
-        generateFormOption("0", "Faculty");
-        generateFormOption("1", "Student");
+    generateFormStart("../includes/userFunctions/removeCourse", "post"); 
+        generateFormStartSelectDiv("Course Name", "courseCode");
+			getCourseList();
         generateFormEndSelectDiv();
-        generateFormButton(NULL, "Create User");
-        generateFormEnd();
+        generateFormButton(NULL, "Remove Course");
+    generateFormEnd();
+}
+
+function getCourseList()
+{
+	$fileName = COURSECSV;
+
+    $newArray = array_map('str_getcsv', file($fileName));
+
+	for ($i = 0; $i < count($newArray); $i++)
+    {
+        generateFormOption($newArray[$i][0], $newArray[$i][1]);
+	}
 }
 
 ?>

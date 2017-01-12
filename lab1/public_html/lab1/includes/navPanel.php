@@ -67,6 +67,15 @@ if (login_check() == true)
     				<li>
     					<a href="removebooks">Remove a Book</a>
     				</li>
+    				<li>
+    					<a href="books">View all Books</a>
+    				</li>
+    				<li>
+    					<a href="booksbycourse">View Books by Course</a>
+    				</li>
+    				<li>
+    					<a href="booksoutofstock">View out of Stock Books</a>
+    				</li>
     			</ul>	
             </li>  
             <li>
@@ -80,6 +89,9 @@ if (login_check() == true)
     				</li>
     				<li>
     					<a href="removecourse">Remove a Course</a>
+    				</li>
+    				<li>
+    					<a href="courses">View all Courses</a>
     				</li>
     			</ul>	
             </li>  

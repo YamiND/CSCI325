@@ -57,12 +57,13 @@ echo '
 
 function removeUserForm()
 {
-    generateFormStart("../includes/userFunctions/removeUser", "post"); 
+    	generateFormStart("../includes/userFunctions/removeUser", "post"); 
         generateFormStartSelectDiv("User's Email", "userEmail");
-			getUserList();
+	getUserList();
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Remove User");
-    generateFormEnd();
+        generateFormEnd();
+
 }
 
 function getUserList()

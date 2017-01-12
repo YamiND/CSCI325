@@ -2,6 +2,8 @@
 
 define("SECURE", FALSE);
 define("USERCSV", "/var/www/html/CSCI325/lab1/private/lab1/users.csv");
+define("COURSECSV", "/var/www/html/CSCI325/lab1/private/lab1/courses.csv");
+define("BOOKCSV", "/var/www/html/CSCI325/lab1/private/lab1/books.csv");
 
 function sec_session_start() 
 {

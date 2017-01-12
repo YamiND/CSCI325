@@ -29,7 +29,9 @@ function viewIndex()
                             <!-- Tab panes -->
                             <div class="tab-content">
                                 <div class="tab-pane fade in active" id="myProfile">
-                                   Links will appear here 
+                                 ';
+						viewLinks();
+echo '
                                 </div>
                             </div>
                         </div>
@@ -39,6 +41,20 @@ function viewIndex()
                 </div>
 			</div>
         ';
+
+}
+
+function viewLinks()
+{
+	echo "<br>";
+
+	foreach(glob("*") as $file) 
+	{
+		$siteName = shell_exec('cat ' . $file . ' | grep "displaySite" | cut -d \'(\' -f2 | cut -d \'"\' -f2');
+		
+		$link = '<a href="'. $file . '">' . $file . '</a>';
+		echo "<p>" . $siteName . " -- " . $link . "</p>";
+	}
 
 }
 

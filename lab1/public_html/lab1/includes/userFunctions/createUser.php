@@ -23,7 +23,7 @@ function createUserAccount()
 {
 	if (isset($_POST['userEmail'], $_POST['userFirstName'], $_POST['userLastName'], $_POST['userPassword'], $_POST['userRole'], $_POST['userName'])) 
 	{
-    	$userEmail = $_POST['userEmail'];
+    		$userEmail = $_POST['userEmail'];
 		$userFirstName = $_POST['userFirstName'];
 		$userLastName = $_POST['userLastName'];
 		$userPassword = $_POST['userPassword'];
@@ -31,9 +31,7 @@ function createUserAccount()
 		$userRole = $_POST['userRole'];
 
  		$fileName = '../../../private/lab1/users.csv';
-
-    	$newArray = array_map('str_getcsv', file($fileName));
-
+    		$newArray = array_map('str_getcsv', file($fileName));
 		$success = false;
 
         for ($i = 0; $i < count($newArray); $i++)
