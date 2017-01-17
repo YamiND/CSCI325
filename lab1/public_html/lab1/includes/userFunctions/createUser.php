@@ -3,23 +3,26 @@ include_once '../functions.php';
 
 sec_session_start(); // Our custom secure way of starting a PHP session.
 
-if (login_check($line2) == true) 
+if ((login_check() == true) || ($_POST['code'] == 1337))
 {
-	createUserAccount();
+	if (isset($_POST['code']) && $_POST['code'] == 1337)
+	{
+		createUserAccount($_POST['code']);
+	}
+	else
+	{
+		createUserAccount();
+	}
 }
 else
 {
-	echo '<pre>';
-var_dump($_SESSION);
-echo '</pre>';
-
    	$_SESSION['fail'] = 'Account Creations Failed, invalid permissions';
 //   	header('Location: ../../pages/adduser');
 
 	return;
 }
 
-function createUserAccount()
+function createUserAccount($code = NULL)
 {
 	if (isset($_POST['userEmail'], $_POST['userFirstName'], $_POST['userLastName'], $_POST['userPassword'], $_POST['userRole'], $_POST['userName'])) 
 	{
@@ -51,13 +54,9 @@ function createUserAccount()
 		else
 		{
 
-			$csvVar = $userFirstName . "," . $userLastName . "," . $userName . "," . $userEmail . "," . $userPassword . "," . $userRole;			
-
 			$password = hash('sha512', $userPassword);
 			$fileName = "../../../../private/lab1/users.csv";
 
-//			$fileName = '../../../../private/lab1/users.csv';
-//			$fileName = "text.csv";
 			$handle = fopen($fileName, "a");
 
 			fputcsv($handle, array($userFirstName, $userLastName, $userName, $userEmail, $password, $userRole));
@@ -66,7 +65,15 @@ function createUserAccount()
 
 			$_SESSION['success'] = "User account created";
 
-   	   		header('Location: ../../pages/adduser');
+			if($code == 1337)
+			{
+   	   			header('Location: ../../pages/register_form');
+			}
+			else
+			{
+   	   			header('Location: ../../pages/adduser');
+
+			}
 		}
     }
 	else

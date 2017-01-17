@@ -9,6 +9,6 @@ include("../includes/pageTemplate.php");
 // All functionNames need to have ($mysqli) in functionFile, but NOT HERE
 // if you do something like viewForm($mysqli) in this file, IT WILL NOT WORK
 
-echo displaySite("View All Books", "../includes/userFunctions/viewAllBooksTable.php", "checkPermissions", "View All Books");
+echo displaySite("Out Of Stock Books", "../includes/userFunctions/booksoutofstock.php", "checkPermissions", "Out Of Stock Books");
 
 ?>

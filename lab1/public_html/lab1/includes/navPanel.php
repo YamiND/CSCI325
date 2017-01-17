@@ -48,7 +48,7 @@ if (login_check() == true)
 
     echo '
             <li>
-                <a href="#"><i class="fa fa-dashboard fa-fw"></i> Dashboard <span class="fa arrow"></span></a>
+                <a href="#"><i class="fa fa-dashboard fa-fw"></i> Navigation <span class="fa arrow"></span></a>
     			<ul class="nav nav-second-level">
     				<li>
     					<a href="index">Index</a>
@@ -68,13 +68,13 @@ if (login_check() == true)
     					<a href="removebooks">Remove a Book</a>
     				</li>
     				<li>
-    					<a href="books">View all Books</a>
+    					<a href="books">View All Books</a>
     				</li>
     				<li>
     					<a href="booksbycourse">View Books by Course</a>
     				</li>
     				<li>
-    					<a href="booksoutofstock">View out of Stock Books</a>
+    					<a href="booksoutofstock">View Out of Stock Books</a>
     				</li>
     			</ul>	
             </li>  
@@ -91,7 +91,7 @@ if (login_check() == true)
     					<a href="removecourse">Remove a Course</a>
     				</li>
     				<li>
-    					<a href="courses">View all Courses</a>
+    					<a href="courses">View All Courses</a>
     				</li>
     			</ul>	
             </li>  
@@ -108,13 +108,13 @@ if (login_check() == true)
     					<a href="removeuser">Remove a User</a>
     				</li>
     				<li>
-    					<a href="users">View all Users</a>
+    					<a href="users">View All Users</a>
     				</li>
     				<li>
-    					<a href="students">View all Students</a>
+    					<a href="students">View All Students</a>
     				</li>
     				<li>
-    					<a href="faculty">View all Faculty</a>
+    					<a href="faculty">View All Faculty</a>
     				</li>
     			</ul>	
             </li>  

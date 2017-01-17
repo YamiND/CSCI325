@@ -5,7 +5,7 @@ function checkPermissions()
 {
     if (login_check() == true)
     {
-        viewAllBooksTable();
+        viewAllOutOfStockBooksTable();
     }
     else
     {
@@ -15,7 +15,7 @@ function checkPermissions()
     }
 }
 
-function viewAllBooksTable()
+function viewAllOutOfStockBooksTable()
 {
 	echo '
             <div class="row">
@@ -24,26 +24,26 @@ function viewAllBooksTable()
                         <div class="panel-heading">
 	     ';
 						// Call Session Message code and Panel Heading here
-                        displayPanelHeading("View All Books");
+                        displayPanelHeading("View Out Of Stock Books");
 echo '
                         </div>
                         <!-- /.panel-heading -->
                         <div class="panel-body">
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#addMaterialType" data-toggle="tab">View All Books</a>
+                                <li class="active"><a href="#addMaterialType" data-toggle="tab">View Out Of Stock Books</a>
                                 </li>
                             </ul>
 
                             <!-- Tab panes -->
                             <div class="tab-content">';
 
-                                    echo '<h4>View All Books</h4>';
+                                    echo '<h4>View Out Of Stock Books</h4>';
                             echo '
                                 
                                 <div class="tab-pane fade in active" id="userTable">';
 
-                                    viewAllBooks();
+                                    viewAllOutOfStockBooks();
 echo '
                                 </div>
                             </div>
@@ -57,7 +57,7 @@ echo '
 
 }
 
-function viewAllBooks()
+function viewAllOutOfStockBooks()
 {
 	$userTable = "profile";
     echo '
@@ -73,7 +73,7 @@ function viewAllBooks()
 			<table width="100%" class="table table-striped table-bordered table-hover" id="' . $userTable . '">
             	<thead>
                 	<tr>
-                        <th>ISBN</th>
+			<th>ISBN</th>
                     	<th>Title</th>
                         <th>Author</th>
                         <th>Publisher/th>
@@ -82,11 +82,11 @@ function viewAllBooks()
                         <th>Amazon Link</th>
                         <th>Course Used</th>
                         <th>Number In Stock</th>
-                    </tr>
+			</tr>
                 </thead>
             <tbody>
         ';          
-           		getBooks();
+           		getOutOfStockBooks();
     echo ' 
            	</tbody>
           </table>
@@ -104,7 +104,7 @@ function viewAllBooks()
 
 }
 
-function getBooks()
+function getOutOfStockBooks()
 {
 	$fileName = BOOKCSV;
     $newArray = array_map('str_getcsv', file($fileName));
@@ -129,19 +129,23 @@ function getBooks()
                 }
                 $numberInStock = $newArray[$i][8]; 
 
-    	echo '
-               <tr class="gradeA">
-                   <td>' . $ISBN . '</td>
-                   <td>' . $Title . '</td>
-                   <td>' . $Author . '</td>
-                   <td>' . $Publisher . '</td>
-                   <td>' . $Year . '</td>
-                   <td>' . '<a href=" ' .  $publisherLink . '">Publisher Page</a>' .  '</td>
-                 <td>' . '<a href=" ' .  $amazonLink . '">Amazon  Page</a>' .  '</td>		
-                   <td>' . $courseUsed . '</td>
-                   <td>' . $numberInStock . '</td>
-		  </tr>
-             ';
+
+    	if($numberInStock <= 0)
+    	{		
+        	echo '
+                        <tr class="gradeA">
+			<td>' . $ISBN . '</td>
+                   	<td>' . $Title . '</td>
+                   	<td>' . $Author . '</td>
+                   	<td>' . $Publisher . '</td>
+                   	<td>' . $Year . '</td>
+                   	<td>' . '<a href=" ' .  $publisherLink . '">Publisher Page</a>' .  '</td>
+                 	<td>' . '<a href=" ' .  $amazonLink . '">Amazon  Page</a>' .  '</td>
+                   	<td>' . $courseUsed . '</td>
+                	<td>' . $numberInStock . '</td>
+			</tr>
+        	     ';
+    	}
     }    
 }
 
