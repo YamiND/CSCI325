@@ -71,6 +71,9 @@ if (login_check() == true)
     					<a href="books">View All Books</a>
     				</li>
     				<li>
+    					<a href="book">View Single Book</a>
+    				</li>
+    				<li>
     					<a href="booksbycourse">View Books by Course</a>
     				</li>
     				<li>
