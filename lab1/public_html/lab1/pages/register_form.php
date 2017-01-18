@@ -34,9 +34,13 @@ if (!isset($_POST['passcode'])):
                                 </div>
 				
 				<input type="Submit" class="btn btn-lg btn-success btn-block" 
-                                                   value="Sign in" />
+                                                   value="Enter Passcode" />
                             </fieldset>
                         </form>
+				<br>
+				<div class="form-group">
+				    <a href="login">Return to Login</a>
+				</div>
                     </div>
                 </div>
             </div>
@@ -125,6 +129,10 @@ echo '
                                     createUserForm($code);
                                     
         echo '
+				<br>
+				<div class="form-group">
+				    <a href="login">Return to Login</a>
+				</div>
                                 </div>
                             </div>
                         </div>

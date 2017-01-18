@@ -35,7 +35,9 @@ if (!isset($_SESSION['roleID'], $_SESSION['userEmail'])):
                                 <div class="form-group">
                                     <input class="form-control" placeholder="Password" name="password" type="password" value="">
                                 </div>
-				
+				<div class="form-group">
+				    <a href="register_form">Register an Account</a>
+				</div>	
 				<input type="Submit" class="btn btn-lg btn-success btn-block" 
                                                    value="Sign in" />
                             </fieldset>
