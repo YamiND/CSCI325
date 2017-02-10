@@ -76,7 +76,7 @@ function viewAllBooks()
                         <th>ISBN</th>
                     	<th>Title</th>
                         <th>Author</th>
-                        <th>Publisher/th>
+                        <th>Publisher</th>
                         <th>Year</th>
 			<th>Publisher Page</th>
                         <th>Amazon Link</th>
