@@ -1,17 +1,3 @@
-ISBN,Title,Author,Publisher,Year Published,Publisher Site,Amazon Site,Dept,Stock
-9780324788846,New Perspectives on Microsoft Office 2007; First Course; Premium Video Edition,Shaffer;Carey;…,South-Western,2016,https://google.com,https://amazon.com,CSCI,0
-9781449699390,Python Programming In Context,Miller; Ranum,Jones & Bartlett,2016,https://google.com,https://amazon.com,CSCI,0
-9781430239604,The Definitive Guide to HTML5,Freeman,Apress,2016,https://google.com,https://amazon.com,CSCI,0
-9781785887642,WordPress Search Engine Optimization,Michael David,Packt Publishing,2016,https://google.com,https://amazon.com,CSCI,0
-,Subscription to Lynda.com (students signs up on their own),,,2016,https://google.com,https://amazon.com,CSCI,0
-9780133591743,Problem Solving with C++,Savitch,Pearson,2016,https://google.com,https://amazon.com,CSCI,0
-9780132774178,Starting Out with C++,Gaddis,Pearson,2016,https://google.com,https://amazon.com,CSCI,0
-9780133591743,Problem Solving with C++,Savitch,Pearson,2016,https://google.com,https://amazon.com,CSCI,0
-9780134397818,Learn Adobe Animate CC for Interactive Media Adobe Certified Associate Exam Preparation,Labrecque/Schwartz,Peachpit Press,2016,https://google.com,https://amazon.com,CSCI,0
-9781449688394,An Introduction to Digital Multimedia,Savage/Vogel,Peachpit Press,2016,https://google.com,https://amazon.com,CSCI,0
-9780240525914,How to Cheat in Adobe Flash CC: The Art of Design and Animation,Georgenes,Peachpit Press,2016,https://google.com,https://amazon.com,CSCI,0
-9781449606008,Databases Illuminated,Richardo,JonesBartlett,2016,https://google.com,https://amazon.com,CSCI,0
-9781133608196,Network + Guide to Networks,Dean,Cengage,2016,https://google.com,https://amazon.com,CSCI,0
 978-0-07-163354-3,Networking; A Beginner's Guide,Hallberg,McGraw Hill,2016,https://google.com,https://amazon.com,CSCI ,0
 9780071776165,Web Application Security,Sullivan Liu,McGraw Hill,2016,https://google.com,https://amazon.com,CSCI,0
 9780072263046,Hackers Challenge 3,Pollino,McGraw Hill/Osborne,2016,https://google.com,https://amazon.com,CSCI,0
@@ -42,7 +28,6 @@ B0047T93DK,Operating System Concepts with Java,Silberschatz/Galvin/Gagne,Wiley,2
 9780321825735,Excursions in Modern Mathematics,Tannenbaum,Pearson,2016,https://google.com,https://amazon.com,MATH,0
 9780321756268,College Algebra in Context,Hashbarger/Yocco,Pearson,2016,https://google.com,https://amazon.com,MATH,0
 978-0-547-16977-4,Brief Applied Calculus,Berresford/Rockett,Cengage,2016,https://google.com,https://amazon.com,MATH,0
-9780618825073,College Trigonometry,Aufmann/Barker/Nation,Cenage Learning,2016,https://google.com,https://amazon.com,MATH,0
 9781429208383,"Calculus, Early Transcendentals",Rogawski,WHFreeman,2016,https://google.com,https://amazon.com,MATH,0
 978-1429208383,"Calculus, Early Transcendentals",Rogawski,WHFreeman,2016,https://google.com,https://amazon.com,MATH,0
 9781111827021,Understanding Basic Statistics,Brase/Brase,BrooksCole,2016,https://google.com,https://amazon.com,MATH,0
@@ -68,6 +53,13 @@ B0047T93DK,Operating System Concepts with Java,Silberschatz/Galvin/Gagne,Wiley,2
 0-07-060230-1,Schaum's Outline Series Theory and Problems of Complex Variables,Spiegel ,McGraw Hill,2016,https://google.com,https://amazon.com,MATH,0
 0-201-43727-9,Real Analysis,Gordon,Addison Wesley,2016,https://google.com,https://amazon.com,MATH,0
 0-88385-165-2,Teaching First: A Guide for New Mathematicians,Rishel,The Mathematical Association of America,2016,https://google.com,https://amazon.com,MATH,0
-,Elementary and Middle School Mathematics,Van De Walle,AllynBacon,2016,https://google.com,https://amazon.com,EDUC,0
 0-87353-486-7,Principles and Standards for School Mathematics CD,National Council of Teachers,NCTM,2016,https://google.com,https://amazon.com,EDUC,0
 0-87353-541-3,No textbook required,,NCTM,2016,https://google.com,https://amazon.com,EDUC,0
+9781449699390,"Python Programming In Context","Miller; Ranum","Jones & Bartlett",2016,https://google.com,https://amazon.com,CSCI,0
+9780324788846,"New Perspectives on Microsoft Office 2007; First Course; Premium Video Edition",Shaffer;Carey;…,South-Western,2017,https://google.com,https://amazon.com,CSCI,0
+9780134397818,"Learn Adobe Animate CC for Interactive Media Adobe Certified Associate Exam Preparation",Labrecque/Schwartz,"Peachpit Press",2016,https://google.com,https://amazon.com,CSCI,0
+9780240525914,"How to Cheat in Adobe Flash CC: The Art of Design and Animation",Georgenes,"Peachpit Press",2016,https://google.com,https://amazon.com,CSCI,0
+9781449606008,"Databases Illuminated",Richardo,JonesBartlett,2016,https://google.com,https://amazon.com,CSCI,0
+9780618825073,"College Trigonometry",Aufmann/Barker/Nation,"Cenage Learning",2016,https://google.com,https://amazon.com,MATH,0
+9781430239604,"The Definitive Guide to HTML5",Freeman,Apress,2016,https://google.com,https://amazon.com,CSCI,10
+9781449688394,"An Introduction to Digital Multimedia",Savage/Vogel,"Peachpit Press",2016,https://google.com,https://amazon.com,CSCI,10

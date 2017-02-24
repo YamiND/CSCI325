@@ -34,7 +34,7 @@ function displaySite($title = NULL, $functionFile = NULL, $functionName = NULL, 
                     </div>
             ';
 			
-	call_user_func("$functionName", $line2);
+	call_user_func("$functionName");
 
     echo '
                 </div>

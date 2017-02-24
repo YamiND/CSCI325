@@ -23,13 +23,14 @@ if (!isset($_SESSION['roleID'], $_SESSION['userEmail'])):
             <div class="col-md-4 col-md-offset-4">
                 <div class="login-panel panel panel-default">
                     <div class="panel-heading">
-                    	<h3 class="panel-title">Sign in to Inventory System</h3>
+                    	<h3 class="panel-title">Inventory System by Tyler Postma, Josh Hester, and Joel Blumenthal</h3>
                     </div>
                     <div class="panel-body">
                         <!--<form role="form">-->
 			<form action="../includes/processLogin" method="post" name="login_form" role="form">
                             <fieldset>
                                 <div class="form-group">
+				    <label> Use zcat@lssu.edu to log in and the password discussed in class </label>
                                     <input class="form-control" placeholder="E-mail" name="userEmail" type="email" autofocus>
                                 </div>
                                 <div class="form-group">

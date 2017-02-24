@@ -1,4 +1,5 @@
 <?php
+
 include_once '../functions.php';
 
 sec_session_start(); // Our custom secure way of starting a PHP session.
@@ -27,27 +28,17 @@ function addBook()
 		//go through posts
 		foreach($_POST as $key => $value)
 		{
-			//check for null
-			if (!empty($value))
-			{
-				//strip slashes
-				$value=stripslashes($value);
+			//strip slashes
+			$value=stripslashes($value);
 			
-				//strip html shit
-				$value = trim(preg_replace('/ +/', ' ', preg_replace('/[^A-Za-z0-9 ]/', ' ', urldecode(html_entity_decode(strip_tags($value))))));
+			//strip html shit
+			$value = trim(preg_replace('/ +/', ' ', preg_replace('/[^A-Za-z0-9 ]/', ' ', urldecode(html_entity_decode(strip_tags($value))))));
+			
+			//trim spaces from right end of string
+			$value = rtrim($value);
 				
-				//trim spaces from right end of string
-				$value = rtrim($value);
-				
-				//trim spacs from left end of string
-				$value = ltrim($value);
-			}
-			else
-			{
-				//set session variable and redirect to add course
-				$_SESSION['fail'] = 'I can\'t process html characters, slashes, spaces at the end, or null values. Try fixing your input.';
-				header('Location: ../../pages/addbooks');
-			}
+			//trim spacs from left end of string
+			$value = ltrim($value);
 		}
 		
     	$bookISBN = $_POST['bookISBN'];
