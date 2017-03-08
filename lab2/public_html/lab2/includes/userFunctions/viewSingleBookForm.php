@@ -1,13 +1,13 @@
 <?php
 
-if (isset($_POST['bookISBN']))
+if (isset($_POST['bookID']))
 {
-	$_SESSION['bookISBN'] = $_POST['bookISBN'];
+	$_SESSION['bookID'] = $_POST['bookID'];
 }
 
 if (isset($_POST['changeBook']))
 {
-	unset($_SESSION['bookISBN']);
+	unset($_SESSION['bookID']);
 }
 
 
@@ -15,8 +15,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewSingleBookForm();
-
+        viewSingleBookForm($mysqli);
     }
     else
     {
@@ -27,7 +26,7 @@ function checkPermissions($mysqli)
 }
 
 
-function viewSingleBookForm()
+function viewSingleBookForm($mysqli)
 {
     echo '
             <div class="row">
@@ -52,13 +51,13 @@ echo '
                                     <br>
             ';
 
-			if (!isset($_SESSION['bookISBN']))
+			if (!isset($_SESSION['bookID']))
 			{
-                                    singleBookForm();
+                                    singleBookForm($mysqli);
 			}
 			else
 			{
-				viewSingleBookTable($_SESSION['bookISBN']);
+				viewSingleBookTable($_SESSION['bookID'], $mysqli);
 				echo "<br>";
     				generateFormStart("", "post"); 
         				generateFormButton("changeBook", "Choose another Book");
@@ -78,7 +77,7 @@ echo '
 
 }
 
-function viewSingleBookTable($bookISBN)
+function viewSingleBookTable($bookID, $mysqli)
 {
     $userTable = "profile";
     echo '
@@ -107,7 +106,7 @@ function viewSingleBookTable($bookISBN)
                 </thead>
             <tbody>
         ';
-                        getBooks($bookISBN);
+                        getBooks($bookID, $mysqli);
     echo '
                 </tbody>
           </table>
@@ -125,69 +124,91 @@ function viewSingleBookTable($bookISBN)
 
 }
 
-function getBooks($bookISBN)
+function getBooks($bookID, $mysqli)
 {
-        $fileName = BOOKCSV;
-    $newArray = array_map('str_getcsv', file($fileName));
-
-    for ($i = 0; $i < count($newArray); $i++)
-    {
-                $ISBN = $newArray[$i][0];
-                $Title = $newArray[$i][1];
-                $Author = $newArray[$i][2];
-                $Publisher = $newArray[$i][3];
-                $Year = $newArray[$i][4];
-                $publisherLink = $newArray[$i][5];
-                $amazonLink = $newArray[$i][6];
-                $courseUsed = $newArray[$i][7];
-                if ($courseUsed==0)
-                {
-                        $courseUsed="CSCI";
-                }
-                else
-                {
-                        $courseUsed="MATH";
-                }
-                $numberInStock = $newArray[$i][8];
-	
-	if ($bookISBN == $ISBN)
+	if ($stmt = $mysqli->prepare("SELECT courseID FROM bookCourseIDs WHERE bookID = ? LIMIT 1"))
 	{
-        	echo '
-               	<tr class="gradeA">
-                   <td>' . $ISBN . '</td>
-                   <td>' . $Title . '</td>
-                   <td>' . $Author . '</td>
-                   <td>' . $Publisher . '</td>
-                   <td>' . $Year . '</td>
-                   <td>' . '<a href=" ' .  $publisherLink . '">Publisher Page</a>' .  '</td>
-                 <td>' . '<a href=" ' .  $amazonLink . '">Amazon  Page</a>' .  '</td>
-                   <td>' . $courseUsed . '</td>
-                   <td>' . $numberInStock . '</td>
-                  </tr>
-             ';
+		// Yeah for now a book can only be used in 1 class....
+		$stmt->bind_param('i', $bookID); 
+
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($courseID);
+			$stmt->store_result();
+
+			while ($stmt->fetch())
+			{
+				$courseName = getCourseName($courseID, $mysqli);
+			}
+		}
+		else
+		{
+			$courseName = "Not used in course";
+		}
 	}
+	else
+	{
+		$courseName = "Not used in course";
+	}
+
+
+	if (empty($courseName))
+	{
+		$courseName = "N/A";
+	}
+
+	if ($stmt = $mysqli->prepare("SELECT bookISBN, bookName, bookAuthor, bookPublisher, bookPublisherLink, bookAmazonLink, bookCourse, bookStock, bookYear FROM books WHERE bookID = ?"))
+	{
+		$stmt->bind_param('i', $bookID);
+	
+		if ($stmt->execute())
+		{	
+			$stmt->bind_result($bookISBN, $bookName, $bookAuthor, $bookPublisher, $bookPublisherLink, $bookAmazonLink, $bookCourse, $bookStock, $bookYear);
+
+			while ($stmt->fetch())
+			{
+        		echo '
+               		<tr class="gradeA">
+               		    <td>' . $bookISBN . '</td>
+               		    <td>' . $bookName . '</td>
+	                   <td>' . $bookAuthor . '</td>
+   		                <td>' . $bookPublisher . '</td>
+       		            <td>' . $bookYear . '</td>
+           		        <td>' . '<a href=" ' .  $bookPublisherLink . '">Publisher Page</a>' .  '</td>
+               		  <td>' . '<a href=" ' .  $bookAmazonLink . '">Amazon  Page</a>' .  '</td>
+                   		<td>' . $courseName . '</td>
+	                   <td>' . $bookStock . '</td>
+                  </tr>
+  		           ';
+			}
+		}
     }
 }
 
-function singleBookForm()
+function singleBookForm($mysqli)
 {
     generateFormStart("", "post"); 
-        generateFormStartSelectDiv("Book Title", "bookISBN");
-			getBookList();
+        generateFormStartSelectDiv("Book Title", "bookID");
+			getBookList($mysqli);
         generateFormEndSelectDiv();
         generateFormButton(NULL, "View Single Book");
     generateFormEnd();
 }
 
-function getBookList()
+function getBookList($mysqli)
 {
-	$fileName = BOOKCSV;
 
-    $newArray = array_map('str_getcsv', file($fileName));
-
-	for ($i = 0; $i < count($newArray); $i++)
+	if ($stmt = $mysqli->prepare("SELECT bookID, bookName FROM books"))
     {
-        generateFormOption($newArray[$i][0], $newArray[$i][1]);
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($bookID, $bookName);
+
+			while ($stmt->fetch())
+			{
+        		generateFormOption($bookID, $bookName);
+			}
+		}
 	}
 }
 
