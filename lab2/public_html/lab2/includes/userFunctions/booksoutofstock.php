@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewAllOutOfStockBooksTable();
+        viewAllOutOfStockBooksTable($mysqli);
     }
     else
     {
@@ -14,7 +14,7 @@ function checkPermissions($mysqli)
     }
 }
 
-function viewAllOutOfStockBooksTable()
+function viewAllOutOfStockBooksTable($mysqli)
 {
 	echo '
             <div class="row">
@@ -42,7 +42,7 @@ echo '
                                 
                                 <div class="tab-pane fade in active" id="userTable">';
 
-                                    viewAllOutOfStockBooks();
+                                    viewAllOutOfStockBooks($mysqli);
 echo '
                                 </div>
                             </div>
@@ -56,7 +56,7 @@ echo '
 
 }
 
-function viewAllOutOfStockBooks()
+function viewAllOutOfStockBooks($mysqli)
 {
 	$userTable = "profile";
     echo '
@@ -80,12 +80,11 @@ function viewAllOutOfStockBooks()
 			<th>Publisher Page</th>
                         <th>Amazon Link</th>
                         <th>Course Used</th>
-                        <th>Number In Stock</th>
 			</tr>
                 </thead>
             <tbody>
         ';          
-           		getOutOfStockBooks();
+           		getOutOfStockBooks($mysqli);
     echo ' 
            	</tbody>
           </table>
@@ -103,49 +102,31 @@ function viewAllOutOfStockBooks()
 
 }
 
-function getOutOfStockBooks()
+function getOutOfStockBooks($mysqli)
 {
-	$fileName = BOOKCSV;
-    $newArray = array_map('str_getcsv', file($fileName));
+	if ($stmt = $mysqli->prepare("SELECT bookISBN, bookName, bookAuthor, bookPublisher, bookYear, bookPublisherLink, bookAmazonLink, bookCourse FROM books WHERE bookStock = 0"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($bookISBN, $bookName, $bookAuthor, $bookPublisher, $bookYear, $bookPublisherLink, $bookAmazonLink, $bookCourse);
 
-    for ($i = 0; $i < count($newArray); $i++)
-    {  
-		$ISBN = $newArray[$i][0];
-		$Title = $newArray[$i][1];
-		$Author = $newArray[$i][2];
-		$Publisher = $newArray[$i][3];	
-		$Year = $newArray[$i][4];
-                $publisherLink = $newArray[$i][5];
-                $amazonLink = $newArray[$i][6];
-                $courseUsed = $newArray[$i][7];
-                if ($courseUsed==0)
-                {
-	                $courseUsed="CSCI";
-                }
-                else
-                {
-	                $courseUsed="MATH";
-                }
-                $numberInStock = $newArray[$i][8]; 
-
-
-    	if($numberInStock <= 0)
-    	{		
-        	echo '
+			while ($stmt->fetch())
+			{
+        		echo '
                         <tr class="gradeA">
-			<td>' . $ISBN . '</td>
-                   	<td>' . $Title . '</td>
-                   	<td>' . $Author . '</td>
-                   	<td>' . $Publisher . '</td>
-                   	<td>' . $Year . '</td>
-                   	<td>' . '<a href=" ' .  $publisherLink . '">Publisher Page</a>' .  '</td>
-                 	<td>' . '<a href=" ' .  $amazonLink . '">Amazon  Page</a>' .  '</td>
-                   	<td>' . $courseUsed . '</td>
-                	<td>' . $numberInStock . '</td>
-			</tr>
-        	     ';
-    	}
-    }    
+						<td>' . $bookISBN . '</td>
+           	        	<td>' . $bookName . '</td>
+           	        	<td>' . $bookAuthor . '</td>
+           	        	<td>' . $bookPublisher . '</td>
+           	        	<td>' . $bookYear . '</td>
+           	        	<td>' . '<a href=" ' .  $bookPublisherLink . '">Publisher Page</a>' .  '</td>
+           		      	<td>' . '<a href=" ' .  $bookAmazonLink . '">Amazon  Page</a>' .  '</td>
+               	    	<td>' . $bookCourse . '</td>
+					</tr>
+       	 	     ';
+			}
+		}
+	}
 }
 
 ?>
