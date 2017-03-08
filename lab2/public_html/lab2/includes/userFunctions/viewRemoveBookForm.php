@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewRemoveBookForm();
+        viewRemoveBookForm($mysqli);
 
     }
     else
@@ -16,7 +16,7 @@ function checkPermissions($mysqli)
 }
 
 
-function viewRemoveBookForm()
+function viewRemoveBookForm($mysqli)
 {
     echo '
             <div class="row">
@@ -40,7 +40,7 @@ echo '
                                 <div class="tab-pane fade in active" id="administrator">
                                     <br>
             ';
-                                    removeBookForm();
+                                    removeBookForm($mysqli);
                                     
         echo '
                                 </div>
@@ -55,25 +55,30 @@ echo '
 
 }
 
-function removeBookForm()
+function removeBookForm($mysqli)
 {
     generateFormStart("../includes/userFunctions/removeBook", "post"); 
-        generateFormStartSelectDiv("Book Title", "bookISBN");
-			getBookList();
+        generateFormStartSelectDiv("Book Title", "bookID");
+			getBookList($mysqli);
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Remove Book");
     generateFormEnd();
 }
 
-function getBookList()
+function getBookList($mysqli)
 {
-	$fileName = BOOKCSV;
-
-    $newArray = array_map('str_getcsv', file($fileName));
-
-	for ($i = 0; $i < count($newArray); $i++)
-    {
-        generateFormOption($newArray[$i][0], $newArray[$i][1]);
+	if ($stmt = $mysqli->prepare("SELECT bookID, bookName FROM books"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($bookID, $bookName);
+			$stmt->store_result();
+	
+			while ($stmt->fetch())
+			{	
+	        	generateFormOption($bookID, $bookName);
+			}
+		}
 	}
 }
 
