@@ -14,8 +14,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewUpdateBookForm();
-
+        viewUpdateBookForm($mysqli);
     }
     else
     {
@@ -26,7 +25,7 @@ function checkPermissions($mysqli)
 }
 
 
-function viewUpdateBookForm()
+function viewUpdateBookForm($mysqli)
 {
     echo '
             <div class="row">
@@ -52,11 +51,11 @@ echo '
             ';
 							if (!isset($_SESSION['updateBook']))
 							{
-                                    getBookForm();
+                                    getBookForm($mysqli);
 							}
 							else
 							{
-								updateBookForm($_SESSION['updateBook']);
+								updateBookForm($_SESSION['updateBook'], $mysqli);
 
 								echo "<br>";
 				
@@ -79,33 +78,21 @@ echo '
 
 }
 
-function updateBookForm($bookISBN)
+function updateBookForm($bookID, $mysqli)
 {
-	unset($_SESSION['updateBook']);
+	if ($stmt = $mysqli->prepare("SELECT bookISBN, bookName, bookAuthor, bookPublisher, bookPublisherLink, bookAmazonLink, bookCourse, bookStock, bookYear FROM books WHERE bookID = ?"))
+	{	
+		$stmt->bind_param('i', $bookID);
 
-	$fileName = BOOKCSV;
+		if ($stmt->execute())
+		{	
+			$stmt->bind_result($bookISBN, $bookName, $bookAuthor, $bookPublisher, $bookPublisherLink, $bookAmazonLink, $bookCourse, $bookStock, $bookYear);
 
-    $newArray = array_map('str_getcsv', file($fileName));
+			$stmt->fetch();
 
-    for ($i = 0; $i < count($newArray); $i++)
-    {   
-        if ($newArray[$i][0] == $bookISBN) 
-        {   
-	        
-	        $bookISBN = $newArray[$i][0];
-	        $bookTitle = $newArray[$i][1];
-	        $bookAuthor = $newArray[$i][2];
-	        $bookPublisher = $newArray[$i][3];
-	        $bookYear = $newArray[$i][4];
-	        $bookPublisherLink = $newArray[$i][5];
-	        $bookAmazonLink = $newArray[$i][6];
-	        $bookCourse = $newArray[$i][7];
-	        $bookStock = $newArray[$i][8];
-			
     		generateFormStart("../includes/userFunctions/updateBook", "post"); 
-				generateFormHiddenInput("oldBookISBN", $bookISBN);
-			    generateFormInputDiv("ISBN", "number", "bookISBN", $bookISBN, NULL, NULL, NULL, "ISBN");
-				generateFormInputDiv("Title", "text", "bookTitle", $bookTitle, NULL, NULL, NULL, "Title");
+			    generateFormInputDiv("ISBN", "text", "bookISBN", $bookISBN, NULL, NULL, NULL, "ISBN");
+				generateFormInputDiv("Title", "text", "bookTitle", $bookName, NULL, NULL, NULL, "Title");
 				generateFormInputDiv("Author", "text", "bookAuthor", $bookAuthor, NULL, NULL, NULL, "Author");
 				generateFormInputDiv("Publisher", "text", "bookPublisher", $bookPublisher, NULL, NULL, NULL, "Publisher");
 				generateFormInputDiv("Year Published", "number", "bookYear", $bookYear, NULL, NULL, NULL, "Year Published");
@@ -117,7 +104,7 @@ function updateBookForm($bookISBN)
 				generateFormInputDiv("Number in Stock", "number", "bookStock", $bookStock, NULL, NULL, "Number in Stock");
 				generateFormButton(NULL, "Update Book");
 			 generateFormEnd();
-        }   
+		}
     }    
 }
 
@@ -146,25 +133,29 @@ function getRoleList($selected)
 }	
 
 
-function getBookForm()
+function getBookForm($mysqli)
 {
     generateFormStart("", "post"); 
         generateFormStartSelectDiv("Book Title", "updateBook");
-			getBookList();
+			getBookList($mysqli);
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Select Book");
     generateFormEnd();
 }
 
-function getBookList()
+function getBookList($mysqli)
 {
-	$fileName = BOOKCSV;
+	if ($stmt = $mysqli->prepare("SELECT bookID, bookName FROM books"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($bookID, $bookName);
 
-    $newArray = array_map('str_getcsv', file($fileName));
-
-	for ($i = 0; $i < count($newArray); $i++)
-    {
-        generateFormOption($newArray[$i][0], $newArray[$i][1]);
+			while ($stmt->fetch())
+			{
+        		generateFormOption($bookID, $bookName);
+			}
+		}
 	}
 }
 
