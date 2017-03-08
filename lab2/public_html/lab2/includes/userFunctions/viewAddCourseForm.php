@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewAddCourseForm();
+        viewAddCourseForm($mysqli);
     }
     else
     {
@@ -15,7 +15,7 @@ function checkPermissions($mysqli)
 }
 
 
-function viewAddCourseForm()
+function viewAddCourseForm($mysqli)
 {
     echo '
             <div class="row">
@@ -39,7 +39,7 @@ echo '
                                 <div class="tab-pane fade in active" id="administrator">
                                     <br>
             ';
-                                    addCourseForm();
+                                    addCourseForm($mysqli);
                                     
         echo '
                                 </div>
@@ -54,7 +54,7 @@ echo '
 
 }
 
-function addCourseForm()
+function addCourseForm($mysqli)
 {
     generateFormStart("../includes/userFunctions/addCourse", "post"); 
         generateFormInputDiv("Course Number", "text", "courseNumber", NULL, NULL, NULL, NULL, "Course Number");
@@ -62,28 +62,27 @@ function addCourseForm()
 		generateFormTextAreaDiv("Course Description", "courseDescription", "5");	
         generateFormInputDiv("Course Description Year", "number", "courseYear", date('Y'), NULL, NULL, NULL, "Course Description Year");
 		generateFormStartSelectDiv("Faculty Last Name", "courseFaculty");
-               getFacultyList();
+               getFacultyList($mysqli);
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Add Course");
    generateFormEnd();
 }
 
-function getFacultyList()
+function getFacultyList($mysqli)
 {
-    $fileName = USERCSV;
+	if ($stmt = $mysqli->prepare("SELECT userID, userFirstName, userLastName FROM users WHERE userIsFaculty"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($userID, $userFirstName, $userLastName);
+			$stmt->store_result();
 
-    $newArray = array_map('str_getcsv', file($fileName));
-
-    for ($i = 0; $i < count($newArray); $i++)
-    {   
-        $userRoleID = $newArray[$i][5];
-
-        if ($userRoleID == 0)
-        {   
-            $userLastName = $newArray[$i][1];
-            generateFormOption($userLastName, $userLastName);
-        }   
-    }   
+			while ($stmt->fetch())
+			{
+            	generateFormOption($userID, "$userLastName, $userFirstName");
+			}
+		}
+	}
 }
 
 ?>
