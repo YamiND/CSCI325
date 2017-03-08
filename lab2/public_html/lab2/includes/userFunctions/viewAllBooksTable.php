@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewAllBooksTable();
+        viewAllBooksTable($mysqli);
     }
     else
     {
@@ -14,7 +14,7 @@ function checkPermissions($mysqli)
     }
 }
 
-function viewAllBooksTable()
+function viewAllBooksTable($mysqli)
 {
 	echo '
             <div class="row">
@@ -42,7 +42,7 @@ echo '
                                 
                                 <div class="tab-pane fade in active" id="userTable">';
 
-                                    viewAllBooks();
+                                    viewAllBooks($mysqli);
 echo '
                                 </div>
                             </div>
@@ -56,7 +56,7 @@ echo '
 
 }
 
-function viewAllBooks()
+function viewAllBooks($mysqli)
 {
 	$userTable = "profile";
     echo '
@@ -85,7 +85,7 @@ function viewAllBooks()
                 </thead>
             <tbody>
         ';          
-           		getBooks();
+           		getBooks($mysqli);
     echo ' 
            	</tbody>
           </table>
@@ -103,45 +103,33 @@ function viewAllBooks()
 
 }
 
-function getBooks()
+function getBooks($mysqli)
 {
-	$fileName = BOOKCSV;
-    $newArray = array_map('str_getcsv', file($fileName));
 
-    for ($i = 0; $i < count($newArray); $i++)
-    {  
-		$ISBN = $newArray[$i][0];
-		$Title = $newArray[$i][1];
-		$Author = $newArray[$i][2];
-		$Publisher = $newArray[$i][3];	
-		$Year = $newArray[$i][4];
-                $publisherLink = $newArray[$i][5];
-                $amazonLink = $newArray[$i][6];
-                $courseUsed = $newArray[$i][7];
-                if ($courseUsed==0)
-                {
-	                $courseUsed="CSCI";
-                }
-                else
-                {
-	                $courseUsed="MATH";
-                }
-                $numberInStock = $newArray[$i][8]; 
-
-    	echo '
-               <tr class="gradeA">
-                   <td>' . $ISBN . '</td>
-                   <td>' . $Title . '</td>
-                   <td>' . $Author . '</td>
-                   <td>' . $Publisher . '</td>
-                   <td>' . $Year . '</td>
-                   <td>' . '<a href=" ' .  $publisherLink . '">Publisher Page</a>' .  '</td>
-                 <td>' . '<a href=" ' .  $amazonLink . '">Amazon  Page</a>' .  '</td>		
-                   <td>' . $courseUsed . '</td>
-                   <td>' . $numberInStock . '</td>
-		  </tr>
-             ';
-    }    
+	if ($stmt = $mysqli->prepare("SELECT bookISBN, bookName, bookAuthor, bookPublisher, bookPublisherLink, bookAmazonLink, bookCourse, bookStock, bookYear FROM books"))
+	{	
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($bookISBN, $bookName, $bookAuthor, $bookPublisher, $bookPublisherLink, $bookAmazonLink, $bookCourse, $bookStock, $bookYear);
+			$stmt->store_result();
+			while ($stmt->fetch())
+			{
+    			echo '
+               		<tr class="gradeA">
+                   		<td>' . $bookISBN . '</td>
+	                   <td>' . $bookName . '</td>
+                	   <td>' . $bookAuthor . '</td>
+                  	 <td>' . $bookPublisher . '</td>
+                  	 <td>' . $bookYear . '</td>
+                  	 <td>' . '<a href=" ' .  $bookPublisherLink . '">Publisher Page</a>' .  '</td>
+                	 <td>' . '<a href=" ' .  $bookAmazonLink . '">Amazon  Page</a>' .  '</td>		
+                   		<td>' . $bookCourse . '</td>
+                   		<td>' . $bookStock . '</td>
+				  </tr>
+       		      ';
+			}
+		}
+	}
 }
 
 ?>
