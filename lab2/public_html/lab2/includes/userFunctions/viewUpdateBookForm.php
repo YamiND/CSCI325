@@ -91,6 +91,7 @@ function updateBookForm($bookID, $mysqli)
 			$stmt->fetch();
 
     		generateFormStart("../includes/userFunctions/updateBook", "post"); 
+				generateFormHiddenInput("bookID", $bookID);
 			    generateFormInputDiv("ISBN", "text", "bookISBN", $bookISBN, NULL, NULL, NULL, "ISBN");
 				generateFormInputDiv("Title", "text", "bookTitle", $bookName, NULL, NULL, NULL, "Title");
 				generateFormInputDiv("Author", "text", "bookAuthor", $bookAuthor, NULL, NULL, NULL, "Author");

@@ -5,43 +5,23 @@ sec_session_start(); // Our custom secure way of starting a PHP session.
 
 if (login_check($mysqli) == true) 
 {
-	updateBook();
+	updateBook($mysqli);
 }
 else
 {
-	echo '<pre>';
-var_dump($_SESSION);
-echo '</pre>';
-
    	$_SESSION['fail'] = 'Course modification Failed, invalid permissions';
 //   	header('Location: ../../pages/adduser');
 
 	return;
 }
 
-function updateBook()
+function updateBook($mysqli)
 {
-	if (isset($_POST['bookISBN'], $_POST['bookTitle'], $_POST['bookAuthor'], $_POST['bookPublisher'], $_POST['bookYear'], $_POST['bookPublisherLink'], $_POST['bookAmazonLink'], $_POST['bookCourseType'], $_POST['bookStock'], $_POST['oldBookISBN'])) 
+	if (isset($_POST['bookISBN'], $_POST['bookTitle'], $_POST['bookAuthor'], $_POST['bookPublisher'], $_POST['bookYear'], $_POST['bookPublisherLink'], $_POST['bookAmazonLink'], $_POST['bookCourseType'], $_POST['bookStock'], $_POST['bookID'])) 
 	{
-		
-		 foreach($_POST as $key => $value)
-                {   
-                        //strip slashes
-                        $value=stripslashes($value);
-    
-                        //strip html shit
-                        $value = trim(preg_replace('/ +/', ' ', preg_replace('/[^A-Za-z0-9 ]/', ' ', urldecode(html_entity_decode(strip_tags($value))))));
-    
-                        //trim spaces from right end of string
-                        $value = rtrim($value);
-    
-                        //trim spacs from left end of string
-                        $value = ltrim($value);
-                } 
-	
-		$oldBookISBN = $_POST['oldBookISBN'];
+		$bookID = $_POST['bookID'];
 		$bookISBN = $_POST['bookISBN'];
-		$bookTitle = $_POST['bookTitle'];
+		$bookName = $_POST['bookTitle'];
     	$bookAuthor = $_POST['bookAuthor'];
 		$bookPublisher = $_POST['bookPublisher'];
 		$bookYear = $_POST['bookYear'];
@@ -50,48 +30,36 @@ function updateBook()
 		$bookCourseType = $_POST['bookCourseType'];
 		$bookStock = $_POST['bookStock'];
 
-
-		$fileName = BOOKCSV;
-        $newArray = array_map('str_getcsv', file($fileName));
-
-        $success = false;
-
-        for ($i = 0; $i < count($newArray); $i++)
-        {   
-            if ($newArray[$i][0] == $oldBookISBN) 
-            {   
-                    $success = true;
-                    break;
-            }   
-        }    
-
-        if (($success) && ($oldBookISBN != $bookISBN))
-        {   
-            $error = "Book already exists, can't change"; 
-            header('Location: ../../pages/error?error=' . $error);
-			return;
-        }
+		if ($bookCourseType == "0")
+		{
+			$bookCourse = "CSCI";
+		}
 		else
 		{
- 	       	for ($i = 0; $i < count($newArray); $i++)
-			{  
-            	if ($newArray[$i][0] == $bookISBN) 
-            	{   
-                	removeLine(BOOKCSV, $bookISBN);
-            	}   
-        	}  
+			$bookCourse = "MATH";
 		}
 
-		$handle = fopen($fileName, "a");
-		fputcsv($handle, array($bookISBN, $bookTitle, $bookAuthor, $bookPublisher, $bookYear, $bookPublisherLink, $bookAmazonLink, $bookCourseType, $bookStock));
-		fclose($handle);
-		$_SESSION['success'] = "Book updated";
-   		header('Location: ../../pages/updatebooks');
+		if ($stmt = $mysqli->prepare("UPDATE books set bookISBN = ?, bookName = ?, bookAuthor = ?, bookPublisher = ?, bookPublisherLink = ?, bookAmazonLink = ?, bookCourse = ?, bookStock = ?, bookYear = ? WHERE bookID = ?"))
+		{
+
+			$stmt->bind_param('sssssssisi', $bookISBN, $bookName, $bookAuthor, $bookPublisher, $bookPublisherLink, $bookAmazonLink, $bookCourse, $bookStock, $bookYear, $bookID);
+
+			if ($stmt->execute())
+			{
+				$_SESSION['success'] = "Book updated";
+		   		header('Location: ../../pages/updatebooks');
+			}
+			else
+			{
+    			$error = "Book could not be updated";
+		   	   	header('Location: ../../pages/error?error=' . $error);
+			}
+		}
     }
 	else
 	{
-    		$error = "Book already exists"; 
-	   	   	header('Location: ../../pages/error?error=' . $error);
+    	$error = "Book could not be updated, data not sent";
+	    header('Location: ../../pages/error?error=' . $error);
 	}
 }
 
