@@ -8,93 +8,76 @@ if ((login_check($mysqli) == true) || ($_POST['code'] == 1337))
 {
 	if (isset($_POST['code']) && $_POST['code'] == 1337)
 	{
-		createUserAccount($_POST['code']);
+		createUserAccount($_POST['code'], $mysqli);
 	}
 	else
 	{
-		createUserAccount();
+		createUserAccount(NULL, $mysqli);
 	}
 }
 else
 {
    	$_SESSION['fail'] = 'Account Creations Failed, invalid permissions';
-//   	header('Location: ../../pages/adduser');
-
-	return;
+   	header('Location: ../../pages/adduser');
 }
 
-function createUserAccount($code = NULL)
+function createUserAccount($code = NULL, $mysqli)
 {
 	if (isset($_POST['userEmail'], $_POST['userFirstName'], $_POST['userLastName'], $_POST['userPassword'], $_POST['userRole'], $_POST['userName'])) 
 	{
 		
-	 foreach($_POST as $key => $value)
-                {   
-                        //strip slashes
-                        $value=stripslashes($value);
-    
-                        //strip html shit
-                        $value = trim(preg_replace('/ +/', ' ', preg_replace('/[^A-Za-z0-9 ]/', ' ', urldecode(html_entity_decode(strip_tags($value))))));
-    
-                        //trim spaces from right end of string
-                        $value = rtrim($value);
-    
-                        //trim spacs from left end of string
-                        $value = ltrim($value);
-                } 	
     	$userEmail = $_POST['userEmail'];
 		$userFirstName = $_POST['userFirstName'];
 		$userLastName = $_POST['userLastName'];
 		$userPassword = $_POST['userPassword'];
 		$userName = $_POST['userName'];
-		$userRole = $_POST['userRole'];
+		$userIsFaculty = $_POST['userRole'];
 
- 		$fileName = '../../../private/lab1/users.csv';
-    		$newArray = array_map('str_getcsv', file($fileName));
-		$success = false;
+		$randomSalt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));
+		$hashedPassword = hash("sha512", $userPassword . $randomSalt);
 
-        for ($i = 0; $i < count($newArray); $i++)
-        {   
-            if ($newArray[$i][3] == $userEmail) 
-            {   
-                    $success = false;
-					break;
-            }   
-        }    	
-
-		if ($success)
+		if ($stmt = $mysqli->prepare("SELECT userEmail FROM users where userEmail = ?"))
 		{
-    		$error = "Account already exists"; 
-	   	   	header('Location: ../../pages/error?error=' . $error);
-		}
-		else
-		{
-
-			$password = hash('sha512', $userPassword);
-			$fileName = "../../../../private/lab1/users.csv";
-
-			$handle = fopen($fileName, "a");
-
-			fputcsv($handle, array($userFirstName, $userLastName, $userName, $userEmail, $password, $userRole));
-			
-			fclose($handle);
-
-			$_SESSION['success'] = "User account created";
-
-			if($code == 1337)
+			$stmt->bind_param('s', $userEmail);
+			$stmt->execute();
+			$stmt->store_result();
+			if ($stmt->num_rows > 0)
 			{
-   	   			header('Location: ../../pages/register_form');
+    			$_SESSION['fail'] = 'Account Creation Failed, Account already exists';
+   	   			header('Location: ../../pages/adduser');
 			}
 			else
 			{
-   	   			header('Location: ../../pages/adduser');
+    	
+				if ($stmt = $mysqli->prepare("INSERT INTO users (userEmail, userPassword, userFirstName, userLastName, userSalt, userIsFaculty) VALUES (?, ?, ?, ?, ?, ?)"))
+				{
+    				$stmt->bind_param('sssssi', $userEmail, $hashedPassword, $userFirstName, $userLastName, $randomSalt, $userIsFaculty); 
 
+	    			if ($stmt->execute())    // Execute the prepared query.
+					{
+   						$_SESSION['successs'] = 'Account Creation success';
+
+						if ($code == "1337")
+						{
+   	   						header('Location: ../../pages/login');
+						}
+						else
+						{
+   	   						header('Location: ../../pages/adduser');
+						}
+					}
+					else
+					{
+    					$error = "Account can not be created, insert failed"; 
+				   	   	header('Location: ../../pages/error?error=' . $error);
+					}
+				}
 			}
 		}
     }
 	else
 	{
-    		$error = "Account already exists"; 
+    		$error = "Account can not be created, data not sent"; 
 	   	   	header('Location: ../../pages/error?error=' . $error);
 	}
 }

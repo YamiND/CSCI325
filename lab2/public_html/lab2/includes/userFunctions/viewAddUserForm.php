@@ -63,8 +63,8 @@ function createUserForm()
         generateFormInputDiv("Last Name", "text", "userLastName", NULL, NULL, NULL, NULL, "Last Name");
 	generateFormInputDiv("Password", "password", "userPassword", NULL, NULL, NULL, NULL, "Password");
         generateFormStartSelectDiv("User Role", "userRole");
-        generateFormOption("0", "Faculty");
-        generateFormOption("1", "Student");
+        generateFormOption("1", "Faculty");
+        generateFormOption("0", "Student");
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Create User");
         generateFormEnd();
