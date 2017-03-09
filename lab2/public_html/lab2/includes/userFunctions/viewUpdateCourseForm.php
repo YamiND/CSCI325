@@ -14,7 +14,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewUpdateCourseForm();
+        viewUpdateCourseForm($mysqli);
 
     }
     else
@@ -26,7 +26,7 @@ function checkPermissions($mysqli)
 }
 
 
-function viewUpdateCourseForm()
+function viewUpdateCourseForm($mysqli)
 {
     echo '
             <div class="row">
@@ -52,11 +52,11 @@ echo '
             ';
 							if (!isset($_SESSION['updateCourse']))
 							{
-                                    getCourseForm();
+                                    getCourseForm($mysqli);
 							}
 							else
 							{
-								updateCourseForm($_SESSION['updateCourse']);
+								updateCourseForm($_SESSION['updateCourse'], $mysqli);
 
 								echo "<br>";
 				
@@ -79,84 +79,111 @@ echo '
 
 }
 
-function updateCourseForm($courseCode)
+function updateCourseForm($courseID, $mysqli)
 {
-	unset($_SESSION['updateCourse']);
 
-	$fileName = COURSECSV;
+	if ($stmt = $mysqli->prepare("SELECT courseCode, courseName, courseDescription, courseYear, courseFacultyID FROM courses WHERE courseID = ?"))
+	{
+		$stmt->bind_param('i', $courseID);
 
-    $newArray = array_map('str_getcsv', file($fileName));
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($courseCode, $courseName, $courseDescription, $courseYear, $courseFacultyID);
+			$stmt->store_result();
+			$stmt->fetch();
 
-    for ($i = 0; $i < count($newArray); $i++)
-    {   
-        if ($newArray[$i][0] == $courseCode) 
-        {   
-	        $courseName = $newArray[$i][1];
-	        $courseDescription = $newArray[$i][2];
-	        $courseDescriptionYear = $newArray[$i][3];
-	        $courseFacultyName = $newArray[$i][4];
+			$courseFacultyName = getFacultyLastName($courseFacultyID, $mysqli);
 
     		generateFormStart("../includes/userFunctions/updateCourse", "post"); 
-				generateFormHiddenInput("oldCourseName", $courseName);
-				generateFormHiddenInput("courseCode", $courseCode);
+				generateFormHiddenInput("courseID", $courseID);
+				generateFormInputDiv("Course Code", "text", "courseCode", $courseCode, NULL, NULL, NULL, "Course Name");
 				generateFormInputDiv("Course Name", "text", "courseName", $courseName, NULL, NULL, NULL, "Course Name");
 				generateFormTextAreaDiv("Course Description", "courseDescription", "5", $courseDescription);
-        		generateFormInputDiv("Course Description Year", "number", "courseDescriptionYear", $courseDescriptionYear, NULL, NULL, NULL, "Course Description Year");
-			generateFormStartSelectDiv("Faculty Last Name", "courseFaculty");
-   		         getFacultyList($courseFacultyName);
+        		generateFormInputDiv("Course Year", "number", "courseYear", $courseYear, NULL, NULL, NULL, "Course Year");
+			generateFormStartSelectDiv("Faculty Name", "courseFacultyID");
+   		         getFacultyList($courseFacultyName, $mysqli);
        		generateFormEndSelectDiv();
        			generateFormButton(NULL, "Update Course");
 		    generateFormEnd();
-
-        }   
-    }    
+		}
+		else
+		{
+			echo "Inside Execute query failed";
+		}
+	}
+	else
+	{
+		echo $mysqli->error;
+	}
 }
 
-function getFacultyList($selected)
+function getFacultyLastName($courseFacultyID, $mysqli)
 {
-    $fileName2 = USERCSV;
+	if ($stmt = $mysqli->prepare("SELECT userFirstName, userLastName FROM users WHERE userID = ?"))
+	{
+		$stmt->bind_param('i', $courseFacultyID);
 
-    $newArray = array_map('str_getcsv', file($fileName2));
-
-    for ($i = 0; $i < count($newArray); $i++)
-    {   
-		$userRoleID = $newArray[$i][5];
-
-		$userLastName = $newArray[$i][1];
-
-		if ($userRoleID == 0)
+		if ($stmt->execute())
 		{
-			if ($selected == $userLastName)
+			$stmt->bind_result($userFirstName, $userLastName);
+
+			$stmt->store_result();
+
+			$stmt->fetch();
+
+			return "$userLastName";
+		}
+	}
+}
+
+function getFacultyList($selected, $mysqli)
+{
+	if ($stmt = $mysqli->prepare("SELECT userID, userFirstName, userLastName FROM users"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($userID, $userFirstName, $userLastName);
+			$stmt->store_result();
+
+			while ($stmt->fetch())
 			{
-        		generateFormOption($userLastName, $userLastName, NULL, "selected");
-			}
-			else
-			{
-        		generateFormOption($userLastName, $userLastName);
+				if ($selected == $userLastName)
+				{
+   		     		generateFormOption($userID, "$userLastName, $userFirstName", NULL, "selected");
+				}
+				else
+				{
+       		 		generateFormOption($userID, "$userLastName, $userFirstName");
+				}
 			}
 		}
-    }
+	}
 }
 
-function getCourseForm()
+function getCourseForm($mysqli)
 {
     generateFormStart("", "post"); 
         generateFormStartSelectDiv("Course Description", "updateCourse");
-			getCourseList();
+			getCourseList($mysqli);
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Select Course");
     generateFormEnd();
 }
 
-function getCourseList()
+function getCourseList($mysqli)
 {
-	$fileName = COURSECSV;
 
-    $newArray = array_map('str_getcsv', file($fileName));
-
-	for ($i = 0; $i < count($newArray); $i++)
+	if ($stmt = $mysqli->prepare("SELECT courseID, courseName FROM courses"))
     {
-        generateFormOption($newArray[$i][0], $newArray[$i][1]);
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($courseID, $courseName);
+
+			while ($stmt->fetch())
+			{
+        		generateFormOption($courseID, $courseName);
+			}
+		}
 	}
 }
 
