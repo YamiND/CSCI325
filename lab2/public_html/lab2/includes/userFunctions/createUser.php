@@ -23,14 +23,13 @@ else
 
 function createUserAccount($code = NULL, $mysqli)
 {
-	if (isset($_POST['userEmail'], $_POST['userFirstName'], $_POST['userLastName'], $_POST['userPassword'], $_POST['userRole'], $_POST['userName'])) 
+	if (isset($_POST['userEmail'], $_POST['userFirstName'], $_POST['userLastName'], $_POST['userPassword'], $_POST['userRole'])) 
 	{
 		
     	$userEmail = $_POST['userEmail'];
 		$userFirstName = $_POST['userFirstName'];
 		$userLastName = $_POST['userLastName'];
 		$userPassword = $_POST['userPassword'];
-		$userName = $_POST['userName'];
 		$userIsFaculty = $_POST['userRole'];
 
 		$randomSalt = hash('sha512', uniqid(mt_rand(1, mt_getrandmax()), true));

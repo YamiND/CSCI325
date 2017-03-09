@@ -58,7 +58,6 @@ function createUserForm()
 {
     	generateFormStart("../includes/userFunctions/createUser", "post"); 
         generateFormInputDiv("Email", "email", "userEmail", NULL, NULL, NULL, NULL, "Email");
-        generateFormInputDiv("UserName", "text", "userName", NULL, NULL, NULL, NULL, "Username");
         generateFormInputDiv("First Name", "text", "userFirstName", NULL, NULL, NULL, NULL, "First Name");
         generateFormInputDiv("Last Name", "text", "userLastName", NULL, NULL, NULL, NULL, "Last Name");
 	generateFormInputDiv("Password", "password", "userPassword", NULL, NULL, NULL, NULL, "Password");
