@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewAllCoursesTable();
+        viewAllCoursesTable($mysqli);
     }
     else
     {
@@ -14,7 +14,7 @@ function checkPermissions($mysqli)
     }
 }
 
-function viewAllCoursesTable()
+function viewAllCoursesTable($mysqli)
 {
 	echo '
             <div class="row">
@@ -42,7 +42,7 @@ echo '
                                 
                                 <div class="tab-pane fade in active" id="userTable">';
 
-                                    viewAllCourses();
+                                    viewAllCourses($mysqli);
 echo '
                                 </div>
                             </div>
@@ -56,7 +56,7 @@ echo '
 
 }
 
-function viewAllCourses()
+function viewAllCourses($mysqli)
 {
 	$userTable = "profile";
     echo '
@@ -81,7 +81,7 @@ function viewAllCourses()
                 </thead>
             <tbody>
         ';          
-           		getCourses();
+           		getCourses($mysqli);
     echo ' 
            	</tbody>
           </table>
@@ -99,29 +99,49 @@ function viewAllCourses()
 
 }
 
-function getCourses()
+function getCourses($mysqli)
 {
-	$fileName = COURSECSV;
-    $newArray = array_map('str_getcsv', file($fileName));
+	if ($stmt = $mysqli->prepare("SELECT courseCode, courseName, courseDescription, courseYear, courseFacultyID FROM courses"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($courseCode, $courseName, $courseDescription, $courseYear, $courseFacultyID);
 
-    for ($i = 0; $i < count($newArray); $i++)
-    {  
-		$courseCode = $newArray[$i][0];
-		$courseName = $newArray[$i][1];
-		$courseDescription = $newArray[$i][2];
-		$courseDescriptionYear = $newArray[$i][3];	
-		$courseFacultyName = $newArray[$i][4];
+			$stmt->store_result();
 
-    	echo '
-               <tr class="gradeA">
-                   <td>' . $courseCode . '</td>
+			while ($stmt->fetch())
+			{
+    			echo '
+               		<tr class="gradeA">
+                   	<td>' . $courseCode . '</td>
                    <td>' . $courseName . '</td>
                    <td>' . $courseDescription . '</td>
-                   <td>' . $courseDescriptionYear . '</td>
-                   <td>' . $courseFacultyName . '</td>
-               </tr>
-             ';
-    }    
+                   <td>' . $courseYear . '</td>
+                   <td>' . getFacultyName($courseFacultyID, $mysqli) . '</td>
+              		 </tr>
+		             ';
+			}
+		}
+	}
+}
+
+function getFacultyName($courseFacultyID, $mysqli)
+{
+	if ($stmt = $mysqli->prepare("SELECT userFirstName, userLastName FROM users WHERE userID = ?"))
+	{
+		$stmt->bind_param('i', $courseFacultyID);
+
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($userFirstName, $userLastName);
+			$stmt->store_result();
+
+			$stmt->fetch();
+
+			return "$userLastName, $userFirstName";
+		}
+	}
+
 }
 
 ?>
