@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewRemoveCourseForm();
+        viewRemoveCourseForm($mysqli);
 
     }
     else
@@ -16,7 +16,7 @@ function checkPermissions($mysqli)
 }
 
 
-function viewRemoveCourseForm()
+function viewRemoveCourseForm($mysqli)
 {
     echo '
             <div class="row">
@@ -31,7 +31,7 @@ echo '
                         <div class="panel-body">
                             <!-- Nav tabs -->
                             <ul class="nav nav-tabs">
-                                <li class="active"><a href="#administrator" data-toggle="tab">User</a>
+                                <li class="active"><a href="#administrator" data-toggle="tab">Remove Course</a>
                                 </li>
                             </ul>
 
@@ -40,7 +40,7 @@ echo '
                                 <div class="tab-pane fade in active" id="administrator">
                                     <br>
             ';
-                                    removeCourseForm();
+                                    removeCourseForm($mysqli);
                                     
         echo '
                                 </div>
@@ -55,25 +55,30 @@ echo '
 
 }
 
-function removeCourseForm()
+function removeCourseForm($mysqli)
 {
     generateFormStart("../includes/userFunctions/removeCourse", "post"); 
-        generateFormStartSelectDiv("Course Name", "courseCode");
-			getCourseList();
+        generateFormStartSelectDiv("Course Name", "courseID");
+			getCourseList($mysqli);
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Remove Course");
     generateFormEnd();
 }
 
-function getCourseList()
+function getCourseList($mysqli)
 {
-	$fileName = COURSECSV;
-
-    $newArray = array_map('str_getcsv', file($fileName));
-
-	for ($i = 0; $i < count($newArray); $i++)
-    {
-        generateFormOption($newArray[$i][0], $newArray[$i][1]);
+	if ($stmt = $mysqli->prepare("SELECT courseID, courseName FROM courses"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($courseID, $courseName);
+			$stmt->store_result();
+			
+			while ($stmt->fetch())
+			{
+        		generateFormOption($courseID, $courseName);
+			}
+		}
 	}
 }
 

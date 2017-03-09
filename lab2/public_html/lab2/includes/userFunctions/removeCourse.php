@@ -6,55 +6,41 @@ sec_session_start(); // Our custom secure way of starting a PHP session.
 
 if (login_check($mysqli) == true) 
 {
-	removeCourse();
+	removeCourse($mysqli);
 }
 else
 {
-	echo '<pre>';
-var_dump($_SESSION);
-echo '</pre>';
-
    	$_SESSION['fail'] = 'Account Creations Failed, invalid permissions';
-//   	header('Location: ../../pages/adduser');
+   	header('Location: ../../pages/removecourse');
 
 	return;
 }
 
-function removeCourse()
+function removeCourse($mysqli)
 {
-	if (isset($_POST['courseCode'])) 
+	if (isset($_POST['courseID'])) 
 	{
-    	$courseCode = $_POST['courseCode'];
+    	$courseID = $_POST['courseID'];
 
- 		$fileName = COURSECSV;
-
-    	$newArray = array_map('str_getcsv', file($fileName));
-
-		$success = false;
-
-        for ($i = 0; $i < count($newArray); $i++)
-        {   
-            if ($newArray[$i][0] == $courseCode) 
-            {   
-				removeLine(COURSECSV, $courseCode);
-				$success = true;
-            }   
-        }    	
-
-		if ($success)
+		if ($stmt = $mysqli->prepare("DELETE FROM courses WHERE courseID = ?"))
 		{
-			$_SESSION['success'] = "Course removed";
-   	   		header('Location: ../../pages/removecourse');
-		}
-		else
-		{
-    		$error = "Course does not exist"; 
-	   	   	header('Location: ../../pages/error?error=' . $error);
+			$stmt->bind_param('i', $courseID);
+
+			if ($stmt->execute())
+			{
+				$_SESSION['success'] = "Course removed";
+   		   		header('Location: ../../pages/removecourse');
+			}
+			else
+			{
+   		 		$error = "Course does not exist, invalid ID"; 
+	   		   	header('Location: ../../pages/error?error=' . $error);
+			}
 		}
     }
 	else
 	{
-    		$error = "Course does not exist"; 
+    		$error = "Course data not sent"; 
 	   	   	header('Location: ../../pages/error?error=' . $error);
 	}
 }
