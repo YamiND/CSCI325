@@ -1,21 +1,20 @@
 <?php
 
-if (isset($_POST['updateEmail']))
+if (isset($_POST['modUserID']))
 {
-	$_SESSION['updateEmail'] = $_POST['updateEmail'];
+	$_SESSION['modUserID'] = $_POST['modUserID'];
 }
 
 if (isset($_POST['changeEmail']))
 {
-	unset($_SESSION['updateEmail']);
+	unset($_SESSION['modUserID']);
 }
 
 function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewUpdateUserForm();
-
+        viewUpdateUserForm($mysqli);
     }
     else
     {
@@ -26,7 +25,7 @@ function checkPermissions($mysqli)
 }
 
 
-function viewUpdateUserForm()
+function viewUpdateUserForm($mysqli)
 {
     echo '
             <div class="row">
@@ -50,13 +49,13 @@ echo '
                                 <div class="tab-pane fade in active" id="administrator">
                                     <br>
             ';
-							if (!isset($_SESSION['updateEmail']))
+							if (!isset($_SESSION['modUserID']))
 							{
-                                    getUserForm();
+                                    getUserForm($mysqli);
 							}
 							else
 							{
-								updateUserForm($_SESSION['updateEmail']);
+								updateUserForm($_SESSION['modUserID'], $mysqli);
 
 								echo "<br>";
 				
@@ -79,50 +78,47 @@ echo '
 
 }
 
-function updateUserForm($userEmail)
+function updateUserForm($modUserID, $mysqli)
 {
-	unset($_SESSION['updateEmail']);
+//TODO: FINISH THIS
+	if ($stmt = $mysqli->prepare("SELECT userEmail, userFirstName, userLastName, userIsFaculty FROM users WHERE userID = ?"))
+	{
+		$stmt->bind_param('i', $modUserID);
 
-	$fileName = USERCSV;
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($userEmail, $userFirstName, $userLastName, $userIsFaculty);
+			$stmt->store_result();
 
-    $newArray = array_map('str_getcsv', file($fileName));
-
-    for ($i = 0; $i < count($newArray); $i++)
-    {   
-        if ($newArray[$i][3] == $userEmail) 
-        {   
-			$userFirstName = $newArray[$i][0];
-			$userLastName = $newArray[$i][1];
-			$userName = $newArray[$i][2];
-			$userRole = $newArray[$i][5];
-    		generateFormStart("../includes/userFunctions/updateUser", "post"); 
-				generateFormHiddenInput("oldEmail", $userEmail);
-				generateFormInputDiv("Email", "email", "userEmail", $userEmail, NULL, NULL, NULL, "Email");
-       		    generateFormInputDiv("Username", "text", "userName", $userName, NULL, NULL, NULL, "Username");
-        		generateFormInputDiv("First Name", "text", "userFirstName", $userFirstName, NULL, NULL, NULL, "First Name");
-		        generateFormInputDiv("Last Name", "text", "userLastName", $userLastName, NULL, NULL, NULL, "Last Name");
-		        generateFormInputDiv("New Password (if entered)", "password", "userPassword", NULL, NULL, NULL, NULL, "Password");
-		        generateFormStartSelectDiv("User Role", "userRole");
-					getRoleList($userRole);
-		        generateFormEndSelectDiv();
-       			generateFormButton(NULL, "Update User");
-		    generateFormEnd();
-        }   
-    }    
+			while ($stmt->fetch())
+			{
+    			generateFormStart("../includes/userFunctions/updateUser", "post"); 
+					generateFormHiddenInput("modUserID", $modUserID);
+					generateFormInputDiv("Email", "email", "userEmail", $userEmail, NULL, NULL, NULL, "Email");
+	        		generateFormInputDiv("First Name", "text", "userFirstName", $userFirstName, NULL, NULL, NULL, "First Name");
+			        generateFormInputDiv("Last Name", "text", "userLastName", $userLastName, NULL, NULL, NULL, "Last Name");
+			        generateFormInputDiv("New Password (if entered)", "password", "userPassword", NULL, NULL, NULL, NULL, "Password");
+			        generateFormStartSelectDiv("User Role", "userRole");
+						getRoleList($userIsFaculty);
+			        generateFormEndSelectDiv();
+   	    			generateFormButton(NULL, "Update User");
+			    generateFormEnd();
+			}
+		}
+	}
 }
 
 function getRoleList($selected)
 {
-
 	for ($i = 0; $i < 2; $i++)
 	{
 		if ($i == 0)
 		{
-			$roleName = "Faculty";
+			$roleName = "Student";
 		}
 		else
 		{
-			$roleName = "Student";
+			$roleName = "Faculty";
 		}
 		if ($i == $selected)
 		{
@@ -135,25 +131,29 @@ function getRoleList($selected)
 	}
 }	
 
-function getUserForm()
+function getUserForm($mysqli)
 {
     generateFormStart("", "post"); 
-        generateFormStartSelectDiv("User's Email", "updateEmail");
-			getUserList();
+        generateFormStartSelectDiv("User", "modUserID");
+			getUserList($mysqli);
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Select User");
     generateFormEnd();
 }
 
-function getUserList()
+function getUserList($mysqli)
 {
-	$fileName = USERCSV;
-
-    $newArray = array_map('str_getcsv', file($fileName));
-
-	for ($i = 0; $i < count($newArray); $i++)
-    {
-        generateFormOption($newArray[$i][3], $newArray[$i][3]);
+	if ($stmt = $mysqli->prepare("SELECT userID, userFirstName, userLastName FROM users"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($userID, $userFirstName, $userLastName);
+			
+			while ($stmt->fetch())
+			{
+        		generateFormOption($userID, "$userLastName, $userFirstName");
+			}
+		}
 	}
 }
 
