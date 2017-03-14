@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewAllStudentsTable();
+        viewAllStudentsTable($mysqli);
     }
     else
     {
@@ -14,7 +14,7 @@ function checkPermissions($mysqli)
     }
 }
 
-function viewAllStudentsTable()
+function viewAllStudentsTable($mysqli)
 {
 	echo '
             <div class="row">
@@ -42,7 +42,7 @@ echo '
                                 
                                 <div class="tab-pane fade in active" id="userTable">';
 
-                                    viewAllStudents();
+                                    viewAllStudents($mysqli);
 echo '
                                 </div>
                             </div>
@@ -56,7 +56,7 @@ echo '
 
 }
 
-function viewAllStudents()
+function viewAllStudents($mysqli)
 {
 	$userTable = "profile";
     echo '
@@ -74,13 +74,12 @@ function viewAllStudents()
                 	<tr>
                         <th>Last Name</th>
                     	<th>First Name</th>
-                        <th>Username</th>
                         <th>Email</th>
                     </tr>
                 </thead>
             <tbody>
         ';          
-           		getUsers();
+           		getUsers($mysqli);
     echo ' 
            	</tbody>
           </table>
@@ -98,36 +97,29 @@ function viewAllStudents()
 
 }
 
-function getUsers()
+function getUsers($mysqli)
 {
-	$fileName = USERCSV;
-    $newArray = array_map('str_getcsv', file($fileName));
-
-    for ($i = 0; $i < count($newArray); $i++)
-    {  
-		$userFirstName = $newArray[$i][0];
-		$userLastName = $newArray[$i][1];
-		$userName = $newArray[$i][2];
-		$userEmail = $newArray[$i][3];	
-		$userRoleID = $newArray[$i][5];
-
-		if ($userRoleID == 0)
+	if ($stmt = $mysqli->prepare("SELECT userFirstName, userLastName, userEmail FROM users WHERE userIsFaculty = 0"))
+	{
+		if ($stmt->execute())
 		{
-			$userRole = "Faculty";
-		}
-		else
-		{
+			$stmt->bind_result($userFirstName, $userLastName, $userEmail);
+			$stmt->store_result();
+	
 
-    		echo '
-               <tr class="gradeA">
-                   <td>' . $userLastName . '</td>
-                   <td>' . $userFirstName . '</td>
-                   <td>' . $userName . '</td>
-                   <td>' . $userEmail . '</td>
-               </tr>
-             ';
+				while ($stmt->fetch())
+				{
+					echo '
+					   <tr class="gradeA">
+						   <td>' . $userLastName . '</td>
+						   <td>' . $userFirstName . '</td>
+						   <td>' . $userEmail . '</td>
+					   </tr>
+					 ';
+				}
+			}
 		}
-    }    
+
 }
 
 ?>

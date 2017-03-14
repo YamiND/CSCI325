@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewAllFacultyTable();
+        viewAllFacultyTable($mysqli);
     }
     else
     {
@@ -14,7 +14,7 @@ function checkPermissions($mysqli)
     }
 }
 
-function viewAllFacultyTable()
+function viewAllFacultyTable($mysqli)
 {
 	echo '
             <div class="row">
@@ -42,7 +42,7 @@ echo '
                                 
                                 <div class="tab-pane fade in active" id="userTable">';
 
-                                    viewAllFaculty();
+                                    viewAllFaculty($mysqli);
 echo '
                                 </div>
                             </div>
@@ -56,7 +56,7 @@ echo '
 
 }
 
-function viewAllFaculty()
+function viewAllFaculty($mysqli)
 {
 	$userTable = "profile";
     echo '
@@ -74,13 +74,12 @@ function viewAllFaculty()
                 	<tr>
                         <th>Last Name</th>
                     	<th>First Name</th>
-                        <th>Username</th>
                         <th>Email</th>
                     </tr>
                 </thead>
             <tbody>
         ';          
-           		getUsers();
+           		getUsers($mysqli);
     echo ' 
            	</tbody>
           </table>
@@ -98,36 +97,29 @@ function viewAllFaculty()
 
 }
 
-function getUsers()
+function getUsers($mysqli)
 {
-	$fileName = USERCSV;
-    $newArray = array_map('str_getcsv', file($fileName));
+    if ($stmt = $mysqli->prepare("SELECT userFirstName, userLastName, userEmail FROM users WHERE userIsFaculty = 1"))
+    {   
+        if ($stmt->execute())
+        {   
+            $stmt->bind_result($userFirstName, $userLastName, $userEmail);
+            $stmt->store_result();
+    
 
-    for ($i = 0; $i < count($newArray); $i++)
-    {  
-		$userFirstName = $newArray[$i][0];
-		$userLastName = $newArray[$i][1];
-		$userName = $newArray[$i][2];
-		$userEmail = $newArray[$i][3];	
-		$userRoleID = $newArray[$i][5];
+                while ($stmt->fetch())
+                {   
+                    echo '
+                       <tr class="gradeA">
+                           <td>' . $userLastName . '</td>
+                           <td>' . $userFirstName . '</td>
+                           <td>' . $userEmail . '</td>
+                       </tr>
+                     ';
+                }   
+            }   
+        }   
 
-		if ($userRoleID == 1)
-		{
-			$userRole = "Students";
-		}
-		else
-		{
-
-    		echo '
-               <tr class="gradeA">
-                   <td>' . $userLastName . '</td>
-                   <td>' . $userFirstName . '</td>
-                   <td>' . $userName . '</td>
-                   <td>' . $userEmail . '</td>
-               </tr>
-             ';
-		}
-    }    
 }
 
 ?>
