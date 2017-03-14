@@ -2,102 +2,75 @@
 include_once '../dbConnect.php';
 include_once '../functions.php';
 
-
 sec_session_start(); // Our custom secure way of starting a PHP session.
 
 if (login_check($mysqli) == true) 
 {
-	updateUserAccount();
+	updateUserAccount($mysqli);
 }
 else
 {
-	echo '<pre>';
-var_dump($_SESSION);
-echo '</pre>';
-
    	$_SESSION['fail'] = 'Account Creations Failed, invalid permissions';
-//   	header('Location: ../../pages/adduser');
-
-	return;
+   	header('Location: ../../pages/updateuser');
 }
 
-function updateUserAccount()
+function updateUserAccount($mysqli)
 {
-	if (isset($_POST['userEmail'], $_POST['oldEmail'], $_POST['userFirstName'], $_POST['userLastName'], $_POST['userRole'], $_POST['userName'])) 
+	if (isset($_POST['modUserID'], $_POST['userEmail'], $_POST['userFirstName'], $_POST['userLastName'], $_POST['userRole'])) 
 	{
-	 foreach($_POST as $key => $value)
-                {   
-                        //strip slashes
-                        $value=stripslashes($value);
-    
-                        //strip html shit
-                        $value = trim(preg_replace('/ +/', ' ', preg_replace('/[^A-Za-z0-9 ]/', ' ', urldecode(html_entity_decode(strip_tags($value))))));
-    
-                        //trim spaces from right end of string
-                        $value = rtrim($value);
-    
-                        //trim spacs from left end of string
-                        $value = ltrim($value);
-                } 	
-		$oldEmail = $_POST['oldEmail'];
+		$userID = $_POST['modUserID'];
     	$userEmail = $_POST['userEmail'];
 		$userFirstName = $_POST['userFirstName'];
 		$userLastName = $_POST['userLastName'];
-		$userName = $_POST['userName'];
 		$userRole = $_POST['userRole'];
 
-
-		$fileName = USERCSV;
-        $newArray = array_map('str_getcsv', file($fileName));
-
-        $success = false;
-
-        for ($i = 0; $i < count($newArray); $i++)
-        {   
-            if ($newArray[$i][3] === $userEmail) 
-            {   
-                    $success = true;
-                    break;
-            }   
-        }    
-
-        if (($success) && ($oldEmail != $userEmail))
-        {   
-            $error = "Email already exists, can't change"; 
-            header('Location: ../../pages/error?error=' . $error);
-			return;
-        }
-		else
+		if ($stmt = $mysqli->prepare("SELECT userPassword, userSalt FROM users WHERE userID = ?"))
 		{
+			// Get current passwoord (hashed) and user's salt
+			$stmt->bind_param('i', $userID);
 
- 	       	for ($i = 0; $i < count($newArray); $i++)
-			{   
-            	if ($newArray[$i][3] == $userEmail) 
-            	{   
-					if (!empty($_POST['userPassword']))
-					{
-						$userPassword = $_POST['userPassword'];	
-						$password = hash('sha512', $userPassword);
-					}
-					else
-					{
-						$password = $newArray[$i][4];
-					}
-                	removeLine(USERCSV, $userEmail);
-            	}   
-        	}  
+			if ($stmt->execute())
+			{
+				$stmt->bind_result($userPassword, $userSalt);
+				$stmt->store_result();
+
+				$stmt->fetch();
+			}
 		}
 
-		$handle = fopen($fileName, "a");
-		fputcsv($handle, array($userFirstName, $userLastName, $userName, $userEmail, $password, $userRole));
-		fclose($handle);
-		$_SESSION['success'] = "User account updated";
-   		header('Location: ../../pages/updateuser');
+		if (isset($_POST['userPassword']) && !empty($_POST['userPassword']))
+		{
+			// If user typed new password, overwrite the one in the DB
+			$userPassword = $_POST['userPassword'];
+			$userPassword = hash("sha512", $userPassword . $randomSalt);			
+		}
+		
+		if ($stmt = $mysqli->prepare("UPDATE users SET userEmail = ?, userFirstName = ?, userLastName = ?, userIsFaculty = ?, userPassword = ? WHERE userID = ?"))
+		{
+			// Update the user
+			$stmt->bind_param('sssisi', $userEmail, $userFirstName, $userLastName, $userRole, $userPassword, $userID);
+
+			if ($stmt->execute())
+			{
+				$_SESSION['success'] = "User account updated";
+		   		header('Location: ../../pages/updateuser');
+			}
+			else
+			{
+   		 		$error = "Account could not be updated"; 
+		   	   	header('Location: ../../pages/error?error=' . $error);
+			}
+		}
+		else
+		{
+   			$error = "Account could not be updated, SQL Update failed"; 
+	   	   	header('Location: ../../pages/error?error=' . $error);
+		}
     }
 	else
 	{
-    		$error = "Account already exists"; 
-	   	   	header('Location: ../../pages/error?error=' . $error);
+   		$error = "Account could not be updated, data not sent"; 
+   	   	header('Location: ../../pages/error?error=' . $error);
 	}
 }
 
