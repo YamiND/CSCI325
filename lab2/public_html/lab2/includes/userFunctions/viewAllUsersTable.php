@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewAllUsersTable();
+        viewAllUsersTable($mysqli);
     }
     else
     {
@@ -14,7 +14,7 @@ function checkPermissions($mysqli)
     }
 }
 
-function viewAllUsersTable()
+function viewAllUsersTable($mysqli)
 {
 	echo '
             <div class="row">
@@ -42,7 +42,7 @@ echo '
                                 
                                 <div class="tab-pane fade in active" id="userTable">';
 
-                                    viewAllUsers();
+                                    viewAllUsers($mysqli);
 echo '
                                 </div>
                             </div>
@@ -56,7 +56,7 @@ echo '
 
 }
 
-function viewAllUsers()
+function viewAllUsers($mysqli)
 {
 	$userTable = "profile";
     echo '
@@ -74,14 +74,13 @@ function viewAllUsers()
                 	<tr>
                         <th>Last Name</th>
                     	<th>First Name</th>
-                        <th>Username</th>
                         <th>Email</th>
                         <th>Role</th>
                     </tr>
                 </thead>
             <tbody>
         ';          
-           		getUsers();
+           		getUsers($mysqli);
     echo ' 
            	</tbody>
           </table>
@@ -99,38 +98,38 @@ function viewAllUsers()
 
 }
 
-function getUsers()
+function getUsers($mysqli)
 {
-	$fileName = USERCSV;
-    $newArray = array_map('str_getcsv', file($fileName));
-
-    for ($i = 0; $i < count($newArray); $i++)
-    {  
-		$userFirstName = $newArray[$i][0];
-		$userLastName = $newArray[$i][1];
-		$userName = $newArray[$i][2];
-		$userEmail = $newArray[$i][3];	
-		$userRoleID = $newArray[$i][5];
-
-		if ($userRoleID == 0)
+	if ($stmt = $mysqli->prepare("SELECT userFirstName, userLastName, userEmail, userIsFaculty FROM users"))
+	{
+		if ($stmt->execute())
 		{
-			$userRole = "Faculty";
+			$stmt->bind_result($userFirstName, $userLastName, $userEmail, $userRole);
+			$stmt->store_result();
+	
+
+				while ($stmt->fetch())
+				{
+					if ($userRole == 1)
+					{
+						$userRole = "Faculty";
+					}
+					else
+					{
+						$userRole = "Student";
+					} 
+					echo '
+					   <tr class="gradeA">
+						   <td>' . $userLastName . '</td>
+						   <td>' . $userFirstName . '</td>
+						   <td>' . $userEmail . '</td>
+						   <td>' . $userRole . '</td>
+					   </tr>
+					 ';
+				}
+			}
 		}
-		else
-		{
-			$userRole = "Student";
-		} 
-
-    	echo '
-               <tr class="gradeA">
-                   <td>' . $userLastName . '</td>
-                   <td>' . $userFirstName . '</td>
-                   <td>' . $userName . '</td>
-                   <td>' . $userEmail . '</td>
-                   <td>' . $userRole . '</td>
-               </tr>
-             ';
-    }    
+        
 }
 
 ?>
