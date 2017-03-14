@@ -6,51 +6,41 @@ sec_session_start(); // Our custom secure way of starting a PHP session.
 
 if (login_check($mysqli) == true) 
 {
-	removeUserAccount();
+	removeUserAccount($mysqli);
 }
 else
 {
-	echo '<pre>';
-var_dump($_SESSION);
-echo '</pre>';
-
    	$_SESSION['fail'] = 'Account Creations Failed, invalid permissions';
-//   	header('Location: ../../pages/adduser');
+   	header('Location: ../../pages/removeuser');
 
 	return;
 }
 
-function removeUserAccount()
+function removeUserAccount($mysqli)
 {
-	if (isset($_POST['userEmail'])) 
+	if (isset($_POST['userID']) && !empty($_POST['userID']) )
 	{
-    	$userEmail = $_POST['userEmail'];
+		$userID = $_POST['userID'];
 
- 		$fileName = USERCSV;
-
-    	$newArray = array_map('str_getcsv', file($fileName));
-
-		$success = false;
-
-        for ($i = 0; $i < count($newArray); $i++)
-        {   
-            if ($newArray[$i][3] == $userEmail) 
-            {   
-				removeLine(USERCSV, $userEmail);
-				$success = true;
-            }   
-        }    	
-
-		if ($success)
+		if ($stmt = $mysqli->prepare("DELETE FROM users WHERE userID = ?"))
 		{
-			$_SESSION['success'] = "User account removed";
-   	   		header('Location: ../../pages/removeuser');
+			$stmt->bind_param('i', $userID);
+
+			if ($stmt->execute())
+			{
+				$_SESSION['success'] = "User account removed";
+	   	   		header('Location: ../../pages/removeuser');
+			}
+			else
+			{
+    			$error = "Account does not exist"; 
+		   	   	header('Location: ../../pages/error?error=' . $error);
+			}
 		}
 		else
 		{
     		$error = "Account does not exist"; 
 	   	   	header('Location: ../../pages/error?error=' . $error);
-
 		}
     }
 	else

@@ -4,7 +4,7 @@ function checkPermissions($mysqli)
 {
     if (login_check($mysqli) == true)
     {
-        viewRemoveUserForm();
+        viewRemoveUserForm($mysqli);
 
     }
     else
@@ -16,7 +16,7 @@ function checkPermissions($mysqli)
 }
 
 
-function viewRemoveUserForm()
+function viewRemoveUserForm($mysqli)
 {
     echo '
             <div class="row">
@@ -40,7 +40,7 @@ echo '
                                 <div class="tab-pane fade in active" id="administrator">
                                     <br>
             ';
-                                    removeUserForm();
+                                    removeUserForm($mysqli);
                                     
         echo '
                                 </div>
@@ -55,26 +55,31 @@ echo '
 
 }
 
-function removeUserForm()
+function removeUserForm($mysqli)
 {
     	generateFormStart("../includes/userFunctions/removeUser", "post"); 
-        generateFormStartSelectDiv("User's Email", "userEmail");
-	getUserList();
+        generateFormStartSelectDiv("User's Name", "userID");
+	getUserList($mysqli);
         generateFormEndSelectDiv();
         generateFormButton(NULL, "Remove User");
         generateFormEnd();
 
 }
 
-function getUserList()
+function getUserList($mysqli)
 {
-	$fileName = USERCSV;
+	if ($stmt = $mysqli->prepare("SELECT userFirstName, userLastName, userID FROM users"))
+	{
+		if ($stmt->execute())
+		{
+			$stmt->bind_result($userFirstName, $userLastName, $userID);
+			$stmt->store_result();
 
-    $newArray = array_map('str_getcsv', file($fileName));
-
-	for ($i = 0; $i < count($newArray); $i++)
-    {
-        generateFormOption($newArray[$i][3], $newArray[$i][3]);
+			while ($stmt->fetch())
+			{
+	        	generateFormOption($userID, "$userLastName, $userFirstName");
+			}
+		}
 	}
 }
 
