@@ -80,7 +80,6 @@ echo '
 
 function updateUserForm($modUserID, $mysqli)
 {
-//TODO: FINISH THIS
 	if ($stmt = $mysqli->prepare("SELECT userEmail, userFirstName, userLastName, userIsFaculty FROM users WHERE userID = ?"))
 	{
 		$stmt->bind_param('i', $modUserID);
